@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#4b5cf0">
+<title>成长计划</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="成长计划">
+<style>
+:root{
+  --bg:#f5f7fb;--ink:#141a24;--sub:#5d6878;--line:#e4e8f0;--card:#fff;
+  --brand:#4b5cf0;--brand2:#8b5cf6;--ok:#0f9d76;--warn:#c2410c;
+  --sport:#dc2626;--exam:#0891b2;--custom:#6b7280;
+  --radius:14px;--shadow:0 1px 2px rgba(20,26,36,.05),0 10px 24px -14px rgba(20,26,36,.22);
+  --sb: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.6;color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;
+}
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.view{flex:1;overflow-y:auto;padding:16px 14px calc(76px + var(--sb));display:none;-webkit-overflow-scrolling:touch}
+.view.active{display:block}
+
+/* 底部 Tab */
+#tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;
+  background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+  padding:6px 0 calc(6px + var(--sb));backdrop-filter:blur(12px);
+}
+#tabbar button{
+  flex:1;border:0;background:none;padding:6px 0 2px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--sub);font-size:11px;font-family:inherit;
+}
+#tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#tabbar button.active{color:var(--brand)}
+
+/* 通用 */
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:17px;margin:22px 0 10px;letter-spacing:-.01em}
+h3{font-size:14.5px;margin:0 0 8px}
+.muted{color:var(--sub);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:14px}
+.bar{height:8px;border-radius:999px;background:#e9edf6;overflow:hidden;margin:8px 0}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;transition:width .35s}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:13.5px;font-family:inherit;cursor:pointer;
+}
+.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.danger{background:#fff;color:var(--warn);border-color:rgba(194,65,12,.35)}
+.btn.sm{padding:6px 10px;font-size:12.5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+
+/* 今日 */
+.today-head{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
+.today-date{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.today-week{color:var(--sub);font-size:13px}
+.today-stat{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--sub)}
+.pill b{color:var(--ink)}
+
+/* 任务卡 */
+.task{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:12px 12px;margin-top:8px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+}
+.task.done{opacity:.62}
+.task .cb{
+  flex:none;width:22px;height:22px;border:1.6px solid #c3cddd;border-radius:7px;background:#fff;
+  margin-top:1px;position:relative;cursor:pointer;
+}
+.task.done .cb{background:var(--ok);border-color:var(--ok)}
+.task.done .cb::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:12px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
+.task .body{min-width:0;flex:1}
+.task .t1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.task .title{font-weight:600;font-size:14.5px}
+.task.done .title{text-decoration:line-through;color:#9aa5b5}
+.task .min{font-size:11.5px;color:#7c8797;background:#f2f5fa;border-radius:6px;padding:1px 6px}
+.task .how{font-size:12.8px;color:var(--sub);margin-top:2px}
+.task .std{font-size:12.2px;color:#0b6b51;background:rgba(15,157,118,.07);border-radius:8px;padding:3px 8px;margin-top:6px;display:inline-block}
+.task.done .how,.task.done .std{color:#9aa5b5;text-decoration:line-through}
+.task .cat{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.task .more{border:0;background:none;color:#93a0b4;font-size:20px;padding:0 4px;cursor:pointer;line-height:1}
+.empty{padding:24px;text-align:center;color:var(--sub);font-size:13px}
+
+/* 周期 */
+.daygrp{margin-top:14px}
+.dayhead{
+  position:sticky;top:0;z-index:5;background:var(--bg);
+  display:flex;align-items:baseline;gap:8px;padding:8px 2px 6px;font-weight:650;
+}
+.dayhead .dt{font-size:14.5px}
+.dayhead .wd{font-size:12px;color:var(--sub);font-weight:400}
+.dayhead .cnt{margin-left:auto;font-size:12px;color:var(--sub);font-weight:400}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin:2px -2px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:none;border:1px solid var(--line);background:#fff;color:var(--sub);
+  border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer;font-family:inherit;
+}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.seqbox{margin-top:16px}
+.seqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:8px}
+.sq{padding:6px 4px;text-align:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:11px;line-height:1.3}
+.sq b{display:block;font-size:11.5px}
+.sq i{font-style:normal;color:#a5b0c0;font-size:10px;letter-spacing:.06em}
+.sq.on{background:rgba(15,157,118,.1);border-color:rgba(15,157,118,.4);color:#0b6b51}
+.sq.on i{color:#0b6b51}
+
+/* 我的 */
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat .k{font-size:12px;color:var(--sub)}
+.stat .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.list{list-style:none;padding:0;margin:8px 0 0}
+.list li{padding:10px 0;border-bottom:1px solid #f1f4f9;display:flex;align-items:center;gap:8px;font-size:13.5px}
+.list li:last-child{border-bottom:0}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f4f9;font-size:13.5px}
+.ph:last-child{border-bottom:0}
+.ph .nm{flex:1}
+.ph .pg{width:100px;height:6px;border-radius:999px;background:#e9edf6;overflow:hidden}
+.ph .pg i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.ph .v{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.searchbox{display:flex;gap:8px;margin-top:8px}
+.searchbox input{
+  flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+  font-size:14px;font-family:inherit;background:#fff;color:var(--ink);
+}
+.results li{cursor:pointer}
+.results li:hover{background:#fafbfe}
+
+/* Modal */
+#modal-root{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
+#modal-root.on{display:flex}
+.mask{position:absolute;inset:0;background:rgba(15,20,30,.45)}
+.modal{
+  position:relative;width:100%;max-width:520px;background:#fff;border-radius:18px 18px 0 0;
+  padding:16px 16px calc(16px + var(--sb));max-height:88dvh;overflow-y:auto;
+  box-shadow:0 -10px 30px -8px rgba(0,0,0,.2);
+  animation:up .2s ease-out;
+}
+@keyframes up{from{transform:translateY(20px);opacity:.4}to{transform:none;opacity:1}}
+.modal h3{margin:0 0 10px;font-size:16px}
+.field{margin:10px 0}
+.field label{display:block;font-size:12.5px;color:var(--sub);margin-bottom:4px}
+.field input,.field select,.field textarea{
+  width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line);
+  font-size:14px;font-family:inherit;color:var(--ink);background:#fff;
+}
+.field textarea{min-height:64px;resize:vertical}
+.field .row{gap:8px}
+.field .row>*{flex:1}
+.weekd{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.weekd button{
+  width:40px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fff;
+  color:var(--sub);font-family:inherit;font-size:12.5px;cursor:pointer;
+}
+.weekd button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%);
+  background:rgba(20,26,36,.92);color:#fff;padding:8px 14px;border-radius:999px;
+  font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section id="view-today" class="view active"></section>
+  <section id="view-cycle" class="view"></section>
+  <section id="view-me" class="view"></section>
+
+  <nav id="tabbar">
+    <button data-view="today" class="active" aria-label="今日">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+      <span>今日</span>
+    </button>
+    <button data-view="cycle" aria-label="周期">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+      <span>周期</span>
+    </button>
+    <button data-view="me" aria-label="我的">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      <span>我的</span>
+    </button>
+  </nav>
+
+</div>
+
+<div id="modal-root"><div class="mask" data-close="1"></div><div class="modal" id="modal-body"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ========== 常量 ========== */
+const STORE_KEY = 'growth-plan:2026-10:v3';
+const DEFAULT_META = {
+  appTitle: '四周成长周期计划',
+  startDate: '2026-10-16',
+  endDate: '2026-11-15',
+  phaseStart: '2026-10-19'
+};
+const PHASES = [
+  { name:'准备期', start:'2026-10-16', end:'2026-10-18' },
+  { name:'第 1 周期', start:'2026-10-19', end:'2026-10-25' },
+  { name:'第 2 周期', start:'2026-10-26', end:'2026-11-01' },
+  { name:'第 3 周期', start:'2026-11-02', end:'2026-11-08' },
+  { name:'第 4 周期', start:'2026-11-09', end:'2026-11-15' }
+];
+const CAT_LABEL = { base:'基础', sk:'护肤', sport:'运动', exam:'考试', custom:'自定义' };
+const CAT_COLOR = { base:'#4b5cf0', sk:'#0f9d76', sport:'#dc2626', exam:'#0891b2', custom:'#6b7280' };
+const WD_CN = ['日','一','二','三','四','五','六'];
+
+/* ========== 种子数据 ========== */
+/* 每行：[日期, 类别, 标题, 分钟, 怎么做, 完成标准] */
+const SEED_ROWS = [
+  // 准备期
+  ['2026-10-16','sk','睡前 · 阿达帕林 第 1 次',10,'洁面后等皮肤完全干 → 全脸薄薄一层，避开眼周、唇周、鼻翼褶皱 → 叠一层面霜 → 凡士林涂关节和脚跟','完成标准 · 涂完在日历上圈住 10/16：以后所有“第几天”都从这里数'],
+  ['2026-10-16','sk','把顺序搬到手机日历',10,'截图这页存相册并贴在书桌前；新建一条重复提醒：每周一＋每周四 21:30（第一次落在 10/19），并手动补上 10/16 当晚','完成标准 · 日历里有一条“每周一＋每周四 21:30”的重复提醒并开了通知'],
+  ['2026-10-16','sk','凡士林',5,'关节、脚跟薄涂（今晚不刷酸，也不能不保湿）','完成标准 · 涂完，明早皮肤不紧绷'],
+  ['2026-10-16','sport','上肢训练',60,'卧推、划船、推举等上肢动作，量力而行，注意热身','完成标准 · 完成 1 小时训练'],
+  ['2026-10-16','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-17','base','挑定字帖与 4 周内容',20,'选一本常用字/楷书字帖，圈出未来 4 周要临的 28 组','完成标准 · 字帖翻开并标记第一组'],
+  ['2026-10-17','base','建小说文档 + 每日打卡表',20,'大纲、人物表、正文三个文档；一张打卡表（日期／字数／一句进度）','完成标准 · 三个文档 + 打卡表就位'],
+  ['2026-10-17','sk','凡士林（今晚不刷酸）',5,'关节、脚跟薄涂；把阿达帕林、面霜、凡士林摆到一眼看得见的位置','完成标准 · 三件东西都在固定位置'],
+  ['2026-10-17','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-10-17','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-18','sk','敷面膜（4 周循环 · 第 1 周）',15,'片状面膜 15 分钟取下 → 按摩吸收 → 面霜锁水；这一晚不刷酸，下一次阿达帕林是 10/19（周一）。下一次周日是 10/25 湿敷补水','完成标准 · 面膜到点取下 + 面霜跟上 + 10/19 的提醒在日历里'],
+  ['2026-10-18','sk','身体乳 + 发膜 + 凡士林',25,'先发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林','完成标准 · 三项全部完成：发膜冲净、身体乳涂开、凡士林到位'],
+  ['2026-10-18','base','单词轻量复习',20,'复习已有生词 30 个，不背新词','完成标准 · 30 个过完，不熟的标出来'],
+  ['2026-10-18','base','练字 · 找手感',20,'写 20 字，标出 3 个最好的','完成标准 · 半页字，3 个字被圈出'],
+  // 第 1 周期
+  ['2026-10-19','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-19','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-19','base','写小说',40,'把大纲拆成 10–12 章，逐章压成一句话','完成标准 · 10–12 条章节线，每条只有一句'],
+  ['2026-10-19','sk','睡前 · 阿达帕林 第 2 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 2 格，并确认日历上还有 10/22 的提醒'],
+  ['2026-10-19','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-19','base','把整条序列变成星期习惯',3,'阿达帕林从现在起固定在每周一＋每周四晚上（10/19、10/22、10/26、10/29、11/2、11/5、11/9、11/12）；周日是深层护理日，不刷酸','完成标准 · 日历里有一条“每周一＋每周四 21:30”的重复提醒，且周日不在其中'],
+  ['2026-10-20','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-20','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-20','base','写小说',40,'写 5 个主要角色小传：欲望 / 恐惧 / 秘密 / 底线','完成标准 · 5 人 × 4 项都有内容，留白处标“待定”'],
+  ['2026-10-20','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-20','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-21','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-21','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-21','base','写小说',45,'试写第一章前半：只往下写，不回改','完成标准 · ≥500 字，写完就停，明天接上'],
+  ['2026-10-21','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-10-21','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-10-21','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-22','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-22','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-22','base','写小说',45,'写完第一章后半，今天收在完整初稿','完成标准 · 第一章 ≥1000 字，最后一句是自己想留下的'],
+  ['2026-10-22','sk','睡前 · 阿达帕林 第 3 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟（3 天后是 10/25 周日深层护理日，那一晚不刷酸，序列从 10/26 起变成每周一＋每周四）','完成标准 · 涂完勾掉序列核对表第 3 格，并确认日历上还有 10/26 的提醒'],
+  ['2026-10-22','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-22','sport','下肢训练',60,'深蹲、硬拉、弓步等下肢动作，注意膝盖轨迹','完成标准 · 完成 1 小时训练'],
+  ['2026-10-22','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-23','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-23','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-23','base','写小说',30,'通读第一章，标 5 处要改的并写出改法','完成标准 · 5 处标记 + 5 条“怎么改”'],
+  ['2026-10-23','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-23','sport','上肢训练',60,'卧推、划船、推举等上肢动作，量力而行，注意热身','完成标准 · 完成 1 小时训练'],
+  ['2026-10-23','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-24','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-24','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-24','base','写小说',15,'本周复盘：字数 / 最好的一句 / 卡住的一处；核对护肤日历并写下新锚点','完成标准 · 复盘 4 行写完，字数进打卡表，下一周期锚点已进日历'],
+  ['2026-10-24','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-24','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-10-24','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-25','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-25','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-25','base','写小说',45,'按清单重写第一章','完成标准 · ≥1200 字，划掉 2 句废话'],
+  ['2026-10-25','sk','去角质（每两周 · 第 1 次）',10,'避开眼周，全脸轻推 30 秒后洗净；不刷酸，下一次阿达帕林是 10/26；下次去角质 11/8','完成标准 · 去角质 + 身体乳全部完成，且 10/26 的提醒在日历里'],
+  ['2026-10-25','sk','湿敷补水（4 周循环 · 第 2 周）',10,'化妆棉浸湿爽肤水，敷全脸 5–10 分钟 → 取下面霜锁水；这一晚不刷酸。下一次周日 11/1 是敷面膜','完成标准 · 湿敷完成 + 面霜锁水'],
+  ['2026-10-25','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-10-25','base','更新下一周期锚点',3,'看“31 天护肤序列核对表”：已过的格子全勾上，再抄出未来 3 个日期','完成标准 · 核对表无空档，未来 3 个日期在手机日历里'],
+  // 第 2 周期
+  ['2026-10-26','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-26','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-26','base','写小说',40,'第 2 章：每章按“目标 → 阻碍 → 意外”三段推进','完成标准 · 第 2 章 ≥800 字，三段齐全'],
+  ['2026-10-26','sk','睡前 · 阿达帕林 第 4 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 4 格，并确认日历上还有 10/29 的提醒'],
+  ['2026-10-26','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-27','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-27','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-27','base','写小说',40,'第 3 章前半','完成标准 · ≥400 字，只完成不打磨'],
+  ['2026-10-27','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-27','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-28','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-28','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-28','base','写小说',45,'第 3 章后半，并把对话改成“这个人会说的话”','完成标准 · 第 3 章 ≥900 字'],
+  ['2026-10-28','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-10-28','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-10-28','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-29','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-29','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-29','base','写小说',45,'第 4 章：本章必须埋 1 条伏笔','完成标准 · ≥800 字，伏笔位置用 ★ 标出'],
+  ['2026-10-29','sk','睡前 · 阿达帕林 第 5 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 5 格，并确认日历上还有 11/2 的提醒'],
+  ['2026-10-29','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-29','sport','下肢训练',60,'深蹲、硬拉、弓步等下肢动作，注意膝盖轨迹','完成标准 · 完成 1 小时训练'],
+  ['2026-10-29','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-30','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-30','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-30','base','写小说',30,'第 5 章：标出人物动机说不通的地方','完成标准 · ≥800 字，动机疑问列成 3 条'],
+  ['2026-10-30','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-30','sport','上肢训练',60,'卧推、划船、推举等上肢动作，量力而行，注意热身','完成标准 · 完成 1 小时训练'],
+  ['2026-10-30','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-10-31','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-10-31','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-10-31','base','写小说',15,'本周复盘：字数 / 最好的一段 / 卡住的一处；核对护肤日历并微调下周目标','完成标准 · 复盘写完，下周字数目标已改到打卡表'],
+  ['2026-10-31','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-10-31','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-10-31','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-01','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-01','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-01','base','写小说',60,'周日长写：从第 6 章往后推','完成标准 · 全篇累计 ≥4500 字'],
+  ['2026-11-01','sk','敷面膜（4 周循环 · 第 3 周）',15,'片状面膜 15 分钟取下 → 按摩吸收 → 面霜锁水；这一晚不刷酸，下一次阿达帕林是 11/2。下一次周日 11/8 是泥膜','完成标准 · 面膜到点取下，面霜跟上'],
+  ['2026-11-01','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-11-01','base','更新下一周期锚点',3,'看“31 天护肤序列核对表”：已过的格子全勾上，再抄出未来 3 个日期','完成标准 · 核对表无空档，未来 3 个日期在手机日历里'],
+  // 第 3 周期
+  ['2026-11-02','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-02','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-02','base','写小说',40,'重改卡住的段落：先写 3 种可能，再挑一种落地','完成标准 · ≥2 个卡壳段落已重写，选版理由一句话'],
+  ['2026-11-02','sk','睡前 · 阿达帕林 第 6 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 6 格，并确认日历上还有 11/5 的提醒'],
+  ['2026-11-02','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-03','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-03','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-03','base','写小说',40,'多线/冲突段落统一视角','完成标准 · 越界的内心描写清零，每章只有一个视点'],
+  ['2026-11-03','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-03','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-04','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-04','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-04','base','写小说',45,'全文对话修订：每段对话要么推情节要么露性格','完成标准 · 删掉 ≥10 句无效对话'],
+  ['2026-11-04','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-11-04','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-11-04','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-05','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-05','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-05','base','写小说',45,'收尾前两章，把前面埋的伏笔逐条回收','完成标准 · ≥1000 字，伏笔回收 3 条以上'],
+  ['2026-11-05','sk','睡前 · 阿达帕林 第 7 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 7 格，并确认日历上还有 11/9 的提醒'],
+  ['2026-11-05','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-05','sport','下肢训练',60,'深蹲、硬拉、弓步等下肢动作，注意膝盖轨迹','完成标准 · 完成 1 小时训练'],
+  ['2026-11-05','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-06','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-06','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-06','base','写小说',30,'把 1–3 章定稿，记下每次改动的原因','完成标准 · 3 章定稿，各配一句改动说明'],
+  ['2026-11-06','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-06','sport','上肢训练',60,'卧推、划船、推举等上肢动作，量力而行，注意热身','完成标准 · 完成 1 小时训练'],
+  ['2026-11-06','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-07','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-07','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-07','base','写小说',15,'周期复盘：全篇字数 / 最好一段（发表素材）/ 最大问题；核对护肤日历','完成标准 · 三项都写进复盘文档，素材段单独存一个文件'],
+  ['2026-11-07','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-07','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-11-07','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-08','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-08','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-08','base','写小说',60,'周日长写：把全篇推到 6500 字','完成标准 · ≥6500 字，结尾要用的 3 个元素已列出'],
+  ['2026-11-08','sk','去角质（每两周 · 第 2 次）',10,'避开眼周，全脸轻推 30 秒后洗净；不刷酸，下一次阿达帕林是 11/9；下次去角质 11/22（新周期）','完成标准 · 去角质 + 身体乳全部完成，且 11/9 的提醒在日历里'],
+  ['2026-11-08','sk','泥膜（4 周循环 · 第 4 周）',15,'T 区或全脸 8–10 分钟，温水冲净 → 立刻补面霜；这一晚不刷酸，下一次阿达帕林是 11/9。下一次周日 11/15 回到第 1 周：敷面膜','完成标准 · 泥膜做完 + 补水跟上，11/9 的提醒在日历里'],
+  ['2026-11-08','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-11-08','base','更新下一周期锚点',3,'看“31 天护肤序列核对表”：已过的格子全勾上，再抄出未来 3 个日期','完成标准 · 核对表无空档，未来 3 个日期在手机日历里'],
+  // 第 4 周期
+  ['2026-11-09','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-09','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-09','base','写小说',40,'终稿：全篇删掉 5% 的字数','完成标准 · 每章都有删改痕迹，字数下降但不缺信息'],
+  ['2026-11-09','sk','睡前 · 阿达帕林 第 8 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟','完成标准 · 涂完勾掉序列核对表第 8 格，并确认日历上还有 11/12 的提醒'],
+  ['2026-11-09','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-10','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-10','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-10','base','写小说',40,'统计字数与章节序号，排版成可发布文档','完成标准 · 一个文档搞定：分章、字数、序号齐全'],
+  ['2026-11-10','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-10','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-11','base','背单词',30,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-11','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-11','base','写小说',45,'写 200 字故事简介 + 3 个标题备选','完成标准 · 简介 ≤200 字，3 个标题敢给人看'],
+  ['2026-11-11','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-11-11','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-11-11','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-12','base','背单词',25,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-12','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-12','base','写小说',45,'最后校对 1–3 章','完成标准 · 改动 ≤10 处，其余接受现状'],
+  ['2026-11-12','sk','睡前 · 阿达帕林 第 9 次',10,'洁面擦干 → 等 3–5 分钟 → 全脸薄涂，避开眼周唇周 → 叠一层面霜 → 凡士林涂关节脚跟（再 3 天撞上 11/15 周日护理日，第 10 次挪到 11/16，已是下一周期）','完成标准 · 涂完勾掉序列核对表第 9 格，并确认日历上还有 11/16 的提醒'],
+  ['2026-11-12','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-12','sport','下肢训练',60,'深蹲、硬拉、弓步等下肢动作，注意膝盖轨迹','完成标准 · 完成 1 小时训练'],
+  ['2026-11-12','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-13','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-13','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-13','base','写小说',30,'全文通读一遍并定稿存档','完成标准 · 一口气读完不出错，文件已备份'],
+  ['2026-11-13','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-13','sport','上肢训练',60,'卧推、划船、推举等上肢动作，量力而行，注意热身','完成标准 · 完成 1 小时训练'],
+  ['2026-11-13','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-14','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-14','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-14','base','写小说',15,'周期大复盘：四个周期各完成几天 / 各期字数 / 护肤体验；排下一个周期的日期','完成标准 · 大复盘成文，下一周期周一到周日的表已写好'],
+  ['2026-11-14','sk','凡士林（基础夜：只保湿）',5,'关节、脚跟薄涂；不刷酸的夜晚也不能省保湿','完成标准 · 涂完，第二天早上皮肤不紧绷'],
+  ['2026-11-14','sport','游泳',60,'自由泳/蛙泳交替，下水前热身、上岸后拉伸','完成标准 · 每次 1h'],
+  ['2026-11-14','exam','预约练车',2,'小程序预约','完成标准 · 早上 8:00 – 晚上 19:00 之内完成'],
+  ['2026-11-15','base','背单词',20,'用不背单词 APP','完成标准 · 完成当日全部任务（学新词、复习旧词、完成两次听写）'],
+  ['2026-11-15','base','练字',20,'写字帖','完成标准 · 硬笔字帖 1 篇，钢笔字帖 1 篇'],
+  ['2026-11-15','base','写小说',60,'收尾：发布或投稿','完成标准 · 链接已发 / 邮件已寄，附标题与简介'],
+  ['2026-11-15','sk','敷面膜（4 周循环 · 新一轮第 1 周）',15,'片状面膜 15 分钟取下 → 按摩吸收 → 面霜锁水；这一晚不刷酸，下一次阿达帕林是 11/16','完成标准 · 面膜到点取下 + 面霜跟上 + 11/16 的提醒在日历里'],
+  ['2026-11-15','sk','身体乳 + 发膜 + 凡士林',25,'发膜 10 分钟冲净、吹到半干涂椰子油护发；洗澡后全身身体乳；睡前凡士林涂关节脚跟','完成标准 · 发膜冲净、身体乳涂开、凡士林到位，三项都勾'],
+  ['2026-11-15','base','更新下一周期锚点',3,'看“31 天护肤序列核对表”：已过的格子全勾上，再抄出未来 3 个日期','完成标准 · 核对表无空档，未来 3 个日期在手机日历里']
+];
+
+/* ========== 状态 ========== */
+let state = null;
+
+function uid(prefix) {
+  return (prefix || 't') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+}
+
+function buildSeedState() {
+  const tasks = SEED_ROWS.map(function(row, i) {
+    return {
+      id: 'seed-' + i,
+      date: row[0],
+      category: row[1],
+      title: row[2],
+      minutes: row[3],
+      how: row[4],
+      std: row[5],
+      groupId: null
+    };
+  });
+  // 分配分组：同类别 + 同标题视为同一系列
+  const map = {};
+  tasks.forEach(function(t) {
+    const k = t.category + '||' + t.title;
+    if (!map[k]) map[k] = 'g-' + Math.random().toString(36).slice(2, 9);
+    t.groupId = map[k];
+  });
+  return { version: 3, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) { state = buildSeedState(); saveState(); return; }
+    const s = JSON.parse(raw);
+    if (!s || !s.tasks) throw new Error('bad');
+    if (!s.meta) s.meta = Object.assign({}, DEFAULT_META);
+    if (!s.checks) s.checks = {};
+    s.version = 3;
+    state = s;
+  } catch(e) {
+    state = buildSeedState();
+    saveState();
+  }
+}
+function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+/* ========== 日期工具 ========== */
+function pad2(n){ return n<10?'0'+n:''+n; }
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function parseD(s){ const a=s.split('-').map(Number); return new Date(a[0],a[1]-1,a[2]); }
+function fmtCN(s){ const d=parseD(s); return (d.getMonth()+1)+'/'+d.getDate(); }
+function wdOf(s){ return parseD(s).getDay(); }
+function wdCN(s){ return '周'+WD_CN[wdOf(s)]; }
+function addDays(s,n){ const d=parseD(s); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function cmpDate(a,b){ return a<b?-1:a>b?1:0; }
+function daysBetween(a,b){ return Math.round((parseD(b)-parseD(a))/86400000); }
+
+/* ========== 计算 ========== */
+function tasksOn(date) {
+  return state.tasks.filter(function(t){ return t.date === date; })
+    .sort(function(a,b){ return (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh'); });
+}
+function allDates() {
+  const set = {};
+  state.tasks.forEach(function(t){ set[t.date] = 1; });
+  return Object.keys(set).sort();
+}
+function isChecked(t) { return !!state.checks[t.id]; }
+function toggleCheck(t) {
+  if (state.checks[t.id]) delete state.checks[t.id];
+  else state.checks[t.id] = 1;
+  saveState();
+}
+function isTodayTask(t) { return t.date === todayStr(); }
+function progressOn(date) {
+  const ts = tasksOn(date);
+  const done = ts.filter(isChecked).length;
+  return { total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 };
+}
+function overallProgress() {
+  const total = state.tasks.length;
+  const done = state.tasks.filter(isChecked).length;
+  return { total: total, done: done, pct: total ? Math.round(done/total*100) : 0 };
+}
+function phaseProgress(p) {
+  const ts = state.tasks.filter(function(t){ return t.date >= p.start && t.date <= p.end; });
+  const done = ts.filter(isChecked).length;
+  return { total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 };
+}
+function streakDays() {
+  // 从今天往前数，连续“当天有任务且全部完成”的天数
+  let cur = todayStr();
+  // 若今天还没完成所有任务，从昨天开始
+  const todayP = progressOn(cur);
+  if (todayP.total > 0 && todayP.done < todayP.total) cur = addDays(cur, -1);
+  let n = 0;
+  for (let i = 0; i < 400; i++) {
+    const p = progressOn(cur);
+    if (p.total === 0) { cur = addDays(cur, -1); continue; }
+    if (p.done === p.total) { n++; cur = addDays(cur, -1); }
+    else break;
+  }
+  return n;
+}
+function weekRangeFor(dateStr) {
+  const d = parseD(dateStr);
+  const wd = d.getDay();
+  const start = addDays(dateStr, -(wd === 0 ? 6 : wd - 1)); // 周一
+  return [start, addDays(start, 6)];
+}
+function weekProgress(dateStr) {
+  const r = weekRangeFor(dateStr);
+  const ts = state.tasks.filter(function(t){ return t.date >= r[0] && t.date <= r[1]; });
+  const done = ts.filter(isChecked).length;
+  return { from: r[0], to: r[1], total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 };
+}
+
+/* ========== 视图：今日 ========== */
+function renderToday() {
+  const el = document.getElementById('view-today');
+  const today = todayStr();
+  const m = state.meta;
+
+  // 周期已结束
+  if (today > m.endDate) {
+    el.innerHTML =
+      '<h1>周期已结束</h1>' +
+      '<p class="muted">' + m.startDate + ' – ' + m.endDate + ' 共 ' + state.tasks.length + ' 项任务，已完成 ' + overallProgress().done + ' 项。</p>' +
+      '<div class="card pad" style="margin-top:14px">' +
+        '<h3>收尾</h3>' +
+        '<p class="muted" style="margin:0 0 10px">建议先导出备份，再决定是否开始新一轮。</p>' +
+        '<div class="row">' +
+          '<button class="btn primary" id="btn-export-end">导出 JSON 备份</button>' +
+          '<button class="btn" id="btn-restart">开始新一轮</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card pad" style="margin-top:12px">' +
+        '<h3>本周期总览</h3>' +
+        renderPhaseListHTML() +
+      '</div>';
+    el.querySelector('#btn-export-end').onclick = exportJSON;
+    el.querySelector('#btn-restart').onclick = openRestartDialog;
+    return;
+  }
+
+  // 周期未开始
+  if (today < m.startDate) {
+    el.innerHTML =
+      '<h1>周期还没开始</h1>' +
+      '<p class="muted">本周期从 ' + m.startDate + ' 开始。今天是 ' + today + '。</p>' +
+      '<div class="card pad" style="margin-top:14px">' +
+        '<p class="muted" style="margin:0 0 10px">可以先看整个周期的任务，也可以把开始日期改到今天。</p>' +
+        '<div class="row"><button class="btn primary" id="btn-shift">把开始日期改到今天</button></div>' +
+      '</div>';
+    el.querySelector('#btn-shift').onclick = function() {
+      state.meta.startDate = today;
+      saveState();
+      renderAll();
+      toast('开始日期已更新');
+    };
+    return;
+  }
+
+  const ts = tasksOn(today);
+  const p = progressOn(today);
+
+  let html = '';
+  html += '<div class="today-head"><span class="today-date">' + fmtCN(today) + '</span><span class="today-week">' + wdCN(today) + '</span></div>';
+  html += '<div class="today-stat">' +
+            '<span class="pill">今日 <b>' + p.done + '/' + p.total + '</b></span>' +
+            '<span class="pill">完成率 <b>' + p.pct + '%</b></span>' +
+            '<span class="pill">连续打卡 <b>' + streakDays() + '</b> 天</span>' +
+          '</div>';
+  html += '<div class="bar"><i style="width:' + p.pct + '%"></i></div>';
+
+  if (!ts.length) {
+    html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
+  } else {
+    html += '<div id="today-tasks">';
+    ts.forEach(function(t){ html += renderTaskHTML(t, 'today'); });
+    html += '</div>';
+    html += '<div style="margin-top:14px;text-align:center"><button class="btn" id="btn-add-today">+ 添加今日任务</button></div>';
+  }
+
+  el.innerHTML = html;
+  el.querySelector('#btn-add-today').onclick = function() {
+    openTaskEditor(null, { date: today });
+  };
+  bindTaskEvents(el, 'today');
+}
+
+/* ========== 视图：周期 ========== */
+let cycleFilter = 'all';
+let cycleSearch = '';
+
+function renderCycle() {
+  const el = document.getElementById('view-cycle');
+  const m = state.meta;
+
+  let html = '';
+  html += '<h1>周期</h1>';
+  html += '<p class="muted">' + m.startDate + ' – ' + m.endDate + ' · 共 ' + state.tasks.length + ' 项</p>';
+  html += '<div class="row" style="margin-top:8px">' +
+            '<button class="btn sm" id="btn-edit-cycle">修改周期起止</button>' +
+            '<button class="btn sm primary" id="btn-add-range">+ 添加任务</button>' +
+          '</div>';
+
+  // 搜索
+  html += '<div class="searchbox"><input id="cycle-search" type="search" placeholder="搜索任务标题…" value="' + escapeAttr(cycleSearch) + '"></div>';
+
+  // 阶段 chips
+  html += '<div class="chips" style="margin-top:10px">';
+  html += '<button class="chip' + (cycleFilter==='all'?' on':'') + '" data-f="all">全部</button>';
+  PHASES.forEach(function(p, i){
+    const sel = cycleFilter === String(i) ? ' on' : '';
+    html += '<button class="chip' + sel + '" data-f="' + i + '">' + p.name + '</button>';
+  });
+  html += '</div>';
+
+  // 阿达帕林核对表（只读）
+  html += '<div class="seqbox card pad">' +
+            '<h3>阿达帕林核对（只读）</h3>' +
+            '<p class="muted" style="margin:0;font-size:12.5px">跟着任务勾选自动更新，共 ' + countAdaparin() + ' 次。</p>' +
+            '<div class="seqgrid">' + renderSeqGrid() + '</div>' +
+          '</div>';
+
+  // 任务列表
+  const dates = filteredDates();
+  if (!dates.length) {
+    html += '<div class="empty">没有匹配的任务</div>';
+  } else {
+    dates.forEach(function(d){
+      const ts = tasksOn(d).filter(taskMatchesFilter);
+      if (!ts.length) return;
+      const p = progressOn(d);
+      html += '<div class="daygrp">' +
+                '<div class="dayhead"><span class="dt">' + fmtCN(d) + '</span>' +
+                  '<span class="wd">' + wdCN(d) + '</span>' +
+                  '<span class="cnt">' + p.done + '/' + p.total + '</span>' +
+                '</div>';
+      ts.forEach(function(t){ html += renderTaskHTML(t, 'cycle'); });
+      html += '</div>';
+    });
+  }
+
+  el.innerHTML = html;
+
+  el.querySelector('#btn-edit-cycle').onclick = openEditCycleDialog;
+  el.querySelector('#btn-add-range').onclick = openAddRangeDialog;
+  el.querySelector('#cycle-search').addEventListener('input', function(e){
+    cycleSearch = e.target.value.trim();
+    renderCycle();
+  });
+  el.querySelectorAll('[data-f]').forEach(function(b){
+    b.onclick = function(){ cycleFilter = b.getAttribute('data-f'); renderCycle(); };
+  });
+  bindTaskEvents(el, 'cycle');
+}
+
+function taskMatchesFilter(t) {
+  if (cycleFilter !== 'all') {
+    const p = PHASES[Number(cycleFilter)];
+    if (!p) return true;
+    if (t.date < p.start || t.date > p.end) return false;
+  }
+  if (cycleSearch) {
+    const q = cycleSearch.toLowerCase();
+    if (!(t.title.toLowerCase().indexOf(q) >= 0 || (t.how||'').toLowerCase().indexOf(q) >= 0)) return false;
+  }
+  return true;
+}
+function filteredDates() {
+  let ds = allDates();
+  if (cycleFilter !== 'all') {
+    const p = PHASES[Number(cycleFilter)];
+    if (p) ds = ds.filter(function(d){ return d >= p.start && d <= p.end; });
+  }
+  if (cycleSearch) {
+    ds = ds.filter(function(d){ return tasksOn(d).some(taskMatchesFilter); });
+  }
+  return ds;
+}
+
+function countAdaparin() {
+  return state.tasks.filter(function(t){ return t.category === 'sk' && /阿达帕林/.test(t.title); }).length;
+}
+function renderSeqGrid() {
+  const adap = state.tasks.filter(function(t){ return t.category === 'sk' && /阿达帕林/.test(t.title); })
+    .sort(function(a,b){ return cmpDate(a.date, b.date); });
+  if (!adap.length) return '<div class="muted" style="grid-column:1/-1;font-size:12.5px">还没有阿达帕林任务</div>';
+  return adap.map(function(t){
+    const on = isChecked(t) ? ' on' : '';
+    return '<div class="sq' + on + '" title="' + escapeAttr(t.title) + '"><b>' + fmtCN(t.date) + '</b><i>第' + (adap.indexOf(t)+1) + '次</i></div>';
+  }).join('');
+}
+
+/* ========== 视图：我的 ========== */
+function renderMe() {
+  const el = document.getElementById('view-me');
+  const o = overallProgress();
+  const streak = streakDays();
+  const wk = weekProgress(todayStr());
+  const today = todayStr();
+
+  let html = '';
+  html += '<h1>我的</h1>';
+
+  // 统计
+  html += '<div class="statgrid">' +
+            '<div class="stat"><div class="k">总进度</div><div class="v">' + o.pct + '%</div><div class="muted" style="font-size:12px">' + o.done + ' / ' + o.total + '</div></div>' +
+            '<div class="stat"><div class="k">连续打卡</div><div class="v">' + streak + '<span style="font-size:13px;font-weight:400;color:var(--sub)"> 天</span></div><div class="muted" style="font-size:12px">今天往前数</div></div>' +
+            '<div class="stat"><div class="k">今日完成</div><div class="v">' + progressOn(today).done + '<span style="font-size:13px;font-weight:400;color:var(--sub)">/' + progressOn(today).total + '</span></div><div class="muted" style="font-size:12px">' + fmtCN(today) + ' ' + wdCN(today) + '</div></div>' +
+            '<div class="stat"><div class="k">本周完成率</div><div class="v">' + wk.pct + '%</div><div class="muted" style="font-size:12px">' + fmtCN(wk.from) + ' – ' + fmtCN(wk.to) + '</div></div>' +
+          '</div>';
+
+  // 阶段进度
+  html += '<div class="card pad" style="margin-top:12px">' +
+            '<h3>五个阶段</h3>' +
+            renderPhaseListHTML() +
+          '</div>';
+
+  // 快捷操作
+  html += '<div class="card pad" style="margin-top:12px">' +
+            '<h3>快捷操作</h3>' +
+            '<div class="row">' +
+              '<button class="btn" id="btn-check-today">勾选今日全部</button>' +
+              '<button class="btn" id="btn-uncheck-today">取消今日全部</button>' +
+            '</div>' +
+          '</div>';
+
+  // 搜索
+  html += '<div class="card pad" style="margin-top:12px">' +
+            '<h3>搜索</h3>' +
+            '<div class="searchbox"><input id="me-search" type="search" placeholder="输入标题关键词，回车搜索"></div>' +
+            '<ul class="list results" id="me-results"></ul>' +
+          '</div>';
+
+  // 数据管理
+  html += '<div class="card pad" style="margin-top:12px">' +
+            '<h3>数据管理</h3>' +
+            '<div class="row">' +
+              '<button class="btn primary" id="btn-export">导出 JSON</button>' +
+              '<button class="btn" id="btn-import">导入 JSON</button>' +
+              '<button class="btn danger" id="btn-reset">重置为初始计划</button>' +
+            '</div>' +
+            '<p class="muted" style="margin:10px 0 0;font-size:12px">导出文件建议存到网盘或发给自己；导入会覆盖当前数据。</p>' +
+          '</div>';
+
+  // 关于
+  html += '<div class="card pad" style="margin-top:12px">' +
+            '<h3>关于</h3>' +
+            '<p class="muted" style="margin:0;font-size:12.5px">版本 v3 · 数据存于本机浏览器 localStorage，换设备不同步。清理浏览器数据会丢失勾选，请定期导出。</p>' +
+          '</div>';
+
+  el.innerHTML = html;
+
+  el.querySelector('#btn-check-today').onclick = function(){
+    tasksOn(today).forEach(function(t){ if (!isChecked(t)) toggleCheck(t); });
+    renderAll();
+    toast('已勾选今日全部');
+  };
+  el.querySelector('#btn-uncheck-today').onclick = function(){
+    tasksOn(today).forEach(function(t){ if (isChecked(t)) toggleCheck(t); });
+    renderAll();
+    toast('已取消今日全部');
+  };
+  el.querySelector('#btn-export').onclick = exportJSON;
+  el.querySelector('#btn-import').onclick = openImportDialog;
+  el.querySelector('#btn-reset').onclick = openResetDialog;
+  el.querySelector('#me-search').addEventListener('input', function(e){
+    const q = e.target.value.trim();
+    const list = document.getElementById('me-results');
+    if (!q) { list.innerHTML = ''; return; }
+    const hits = state.tasks.filter(function(t){
+      return t.title.toLowerCase().indexOf(q.toLowerCase()) >= 0;
+    }).slice(0, 30);
+    list.innerHTML = hits.map(function(t){
+      return '<li data-id="' + t.id + '"><span class="cat" style="background:' + CAT_COLOR[t.category] + '"></span>' + escapeHTML(t.title) + '<span class="spacer"></span><span class="muted" style="font-size:12px">' + fmtCN(t.date) + '</span></li>';
+    }).join('') || '<li class="muted" style="border:0">没有匹配</li>';
+    list.querySelectorAll('li[data-id]').forEach(function(li){
+      li.onclick = function(){
+        const id = li.getAttribute('data-id');
+        const t = state.tasks.find(function(x){ return x.id === id; });
+        if (!t) return;
+        switchView('cycle');
+        cycleFilter = 'all'; cycleSearch = t.title;
+        renderCycle();
+        // 滚动到那一天
+        setTimeout(function(){
+          const grps = document.querySelectorAll('#view-cycle .dayhead .dt');
+          for (const g of grps) {
+            if (g.textContent === fmtCN(t.date)) {
+              g.parentElement.scrollIntoView({behavior:'smooth', block:'start'});
+              break;
+            }
+          }
+        }, 80);
+      };
+    });
+  });
+}
+
+function renderPhaseListHTML() {
+  return PHASES.map(function(p){
+    const pr = phaseProgress(p);
+    return '<div class="ph">' +
+             '<span class="nm">' + p.name + '<br><span class="muted" style="font-size:11.5px">' + fmtCN(p.start) + ' – ' + fmtCN(p.end) + '</span></span>' +
+             '<span class="pg"><i style="width:' + pr.pct + '%"></i></span>' +
+             '<span class="v">' + pr.done + '/' + pr.total + '</span>' +
+           '</div>';
+  }).join('');
+}
+
+/* ========== 任务渲染 ========== */
+function renderTaskHTML(t, ctx) {
+  const done = isChecked(t);
+  const cat = CAT_COLOR[t.category] || CAT_COLOR.custom;
+  return '<div class="task' + (done ? ' done' : '') + '" data-id="' + t.id + '">' +
+           '<span class="cb" data-act="toggle"></span>' +
+           '<div class="body">' +
+             '<div class="t1">' +
+               '<span class="title"><span class="cat" style="background:' + cat + '"></span>' + escapeHTML(t.title) + '</span>' +
+               '<span class="min">' + t.minutes + 'min</span>' +
+             '</div>' +
+             (t.how ? '<div class="how">' + escapeHTML(t.how) + '</div>' : '') +
+             (t.std ? '<div class="std">' + escapeHTML(t.std) + '</div>' : '') +
+           '</div>' +
+           '<button class="more" data-act="more" aria-label="更多">⋯</button>' +
+         '</div>';
+}
+
+function bindTaskEvents(root, ctx) {
+  root.querySelectorAll('.task').forEach(function(el){
+    const id = el.getAttribute('data-id');
+    const t = state.tasks.find(function(x){ return x.id === id; });
+    if (!t) return;
+    el.querySelector('[data-act="toggle"]').onclick = function(){
+      toggleCheck(t); renderAll();
+    };
+    el.querySelector('[data-act="more"]').onclick = function(e){
+      e.stopPropagation();
+      openTaskMenu(t, ctx);
+    };
+  });
+}
+
+/* ========== 弹窗 ========== */
+const modalRoot = document.getElementById('modal-root');
+const modalBody = document.getElementById('modal-body');
+function openModal(html) {
+  modalBody.innerHTML = html;
+  modalRoot.classList.add('on');
+}
+function closeModal() {
+  modalRoot.classList.remove('on');
+  modalBody.innerHTML = '';
+}
+modalRoot.addEventListener('click', function(e){
+  if (e.target.getAttribute && e.target.getAttribute('data-close')) closeModal();
+});
+
+function openTaskMenu(t, ctx) {
+  let html = '<h3>' + escapeHTML(t.title) + '</h3>';
+  html += '<p class="muted" style="margin:0 0 10px;font-size:12.5px">' + fmtCN(t.date) + ' ' + wdCN(t.date) + ' · ' + (CAT_LABEL[t.category]||'') + ' · ' + t.minutes + 'min</p>';
+  html += '<div class="row">' +
+            '<button class="btn primary" data-a="edit">编辑</button>' +
+            '<button class="btn" data-a="date">改日期</button>' +
+            '<button class="btn danger" data-a="del">删除这一条</button>';
+  if (t.groupId) {
+    const n = state.tasks.filter(function(x){ return x.groupId === t.groupId; }).length;
+    if (n > 1) html += '<button class="btn danger" data-a="delgroup">删除这一系列（' + n + ' 条）</button>';
+  }
+  html += '</div>';
+  openModal(html);
+  modalBody.querySelectorAll('[data-a]').forEach(function(b){
+    b.onclick = function(){
+      const a = b.getAttribute('data-a');
+      if (a === 'edit') { closeModal(); openTaskEditor(t.id, null); }
+      else if (a === 'date') { closeModal(); openChangeDateDialog(t); }
+      else if (a === 'del') { deleteTask(t.id); closeModal(); renderAll(); toast('已删除'); }
+      else if (a === 'delgroup') {
+        const gid = t.groupId;
+        state.tasks = state.tasks.filter(function(x){ return x.groupId !== gid; });
+        Object.keys(state.checks).forEach(function(k){ /* 勾选状态按 id 存，无需清理 */ });
+        saveState(); closeModal(); renderAll(); toast('已删除整组');
+      }
+    };
+  });
+}
+
+function openChangeDateDialog(t) {
+  openModal(
+    '<h3>改日期</h3>' +
+    '<div class="field"><label>新日期</label><input type="date" id="f-date" value="' + t.date + '"></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">保存</button></div>'
+  );
+  modalBody.querySelector('#f-ok').onclick = function(){
+    const v = modalBody.querySelector('#f-date').value;
+    if (!v) return;
+    t.date = v; saveState(); closeModal(); renderAll(); toast('日期已改');
+  };
+}
+
+function openTaskEditor(id, defaults) {
+  const t = id ? state.tasks.find(function(x){ return x.id === id; }) : null;
+  const d = t || defaults || {};
+  const title = t ? t.title : '新任务';
+  const category = t ? t.category : 'base';
+  const minutes = t ? t.minutes : 20;
+  const how = t ? (t.how||'') : '';
+  const std = t ? (t.std||'') : '';
+  const date = t ? t.date : (d.date || todayStr());
+  openModal(
+    '<h3>' + (t ? '编辑任务' : '新建任务') + '</h3>' +
+    '<div class="field"><label>标题</label><input id="f-title" value="' + escapeAttr(title) + '"></div>' +
+    '<div class="field"><label>类别</label>' +
+      '<select id="f-category">' +
+        ['base','sk','sport','exam','custom'].map(function(c){
+          return '<option value="' + c + '"' + (c===category?' selected':'') + '>' + CAT_LABEL[c] + '</option>';
+        }).join('') +
+      '</select></div>' +
+    '<div class="field"><label>时长（分钟）</label><input id="f-min" type="number" min="1" value="' + minutes + '"></div>' +
+    '<div class="field"><label>日期</label><input id="f-date" type="date" value="' + date + '"></div>' +
+    '<div class="field"><label>怎么做</label><textarea id="f-how">' + escapeHTML(how) + '</textarea></div>' +
+    '<div class="field"><label>完成标准</label><textarea id="f-std">' + escapeHTML(std) + '</textarea></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-save">保存</button></div>'
+  );
+  modalBody.querySelector('#f-save').onclick = function(){
+    const data = {
+      title: modalBody.querySelector('#f-title').value.trim() || '未命名任务',
+      category: modalBody.querySelector('#f-category').value,
+      minutes: Math.max(1, parseInt(modalBody.querySelector('#f-min').value, 10) || 1),
+      date: modalBody.querySelector('#f-date').value || todayStr(),
+      how: modalBody.querySelector('#f-how').value.trim(),
+      std: modalBody.querySelector('#f-std').value.trim()
+    };
+    if (t) {
+      Object.assign(t, data);
+    } else {
+      state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g') }, data));
+    }
+    saveState(); closeModal(); renderAll(); toast('已保存');
+  };
+}
+
+function openAddRangeDialog() {
+  const start = state.meta.startDate > todayStr() ? state.meta.startDate : todayStr();
+  const defaultStart = start;
+  const defaultEnd = state.meta.endDate;
+  openModal(
+    '<h3>添加持续任务</h3>' +
+    '<div class="field"><label>标题</label><input id="f-title" placeholder="例如：晨间拉伸"></div>' +
+    '<div class="field"><label>类别</label>' +
+      '<select id="f-category">' +
+        ['base','sk','sport','exam','custom'].map(function(c){
+          return '<option value="' + c + '"' + (c==='custom'?' selected':'') + '>' + CAT_LABEL[c] + '</option>';
+        }).join('') +
+      '</select></div>' +
+    '<div class="field"><label>时长（分钟）</label><input id="f-min" type="number" min="1" value="15"></div>' +
+    '<div class="field"><label>从</label><input id="f-from" type="date" value="' + defaultStart + '"></div>' +
+    '<div class="field"><label>到</label><input id="f-to" type="date" value="' + defaultEnd + '"></div>' +
+    '<div class="field"><label>星期（不选＝每天）</label>' +
+      '<div class="weekd" id="f-wd">' +
+        [1,2,3,4,5,6,0].map(function(w){
+          return '<button type="button" data-w="' + w + '">' + WD_CN[w] + '</button>';
+        }).join('') +
+      '</div></div>' +
+    '<div class="field"><label>怎么做</label><textarea id="f-how"></textarea></div>' +
+    '<div class="field"><label>完成标准</label><textarea id="f-std"></textarea></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-add">生成任务</button></div>'
+  );
+  const wdSet = new Set();
+  modalBody.querySelectorAll('#f-wd button').forEach(function(b){
+    b.onclick = function(){
+      const w = parseInt(b.getAttribute('data-w'), 10);
+      if (wdSet.has(w)) { wdSet.delete(w); b.classList.remove('on'); }
+      else { wdSet.add(w); b.classList.add('on'); }
+    };
+  });
+  modalBody.querySelector('#f-add').onclick = function(){
+    const title = modalBody.querySelector('#f-title').value.trim();
+    if (!title) { toast('请填标题'); return; }
+    const category = modalBody.querySelector('#f-category').value;
+    const minutes = Math.max(1, parseInt(modalBody.querySelector('#f-min').value, 10) || 1);
+    const from = modalBody.querySelector('#f-from').value;
+    const to = modalBody.querySelector('#f-to').value;
+    const how = modalBody.querySelector('#f-how').value.trim();
+    const std = modalBody.querySelector('#f-std').value.trim();
+    if (!from || !to || from > to) { toast('日期不合法'); return; }
+    const gid = uid('g');
+    let n = 0;
+    let cur = from;
+    while (cur <= to) {
+      const w = wdOf(cur);
+      if (!wdSet.size || wdSet.has(w)) {
+        state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: category, title: title, minutes: minutes, how: how, std: std });
+        n++;
+      }
+      cur = addDays(cur, 1);
+    }
+    saveState(); closeModal(); renderAll();
+    toast('已生成 ' + n + ' 条任务');
+  };
+}
+
+function openEditCycleDialog() {
+  openModal(
+    '<h3>修改周期起止</h3>' +
+    '<p class="muted" style="font-size:12.5px;margin:0 0 10px">只影响日期范围和统计显示，不会删除任务。</p>' +
+    '<div class="field"><label>开始日期</label><input id="f-start" type="date" value="' + state.meta.startDate + '"></div>' +
+    '<div class="field"><label>结束日期</label><input id="f-end" type="date" value="' + state.meta.endDate + '"></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">保存</button></div>'
+  );
+  modalBody.querySelector('#f-ok').onclick = function(){
+    const s = modalBody.querySelector('#f-start').value;
+    const e = modalBody.querySelector('#f-end').value;
+    if (!s || !e || s > e) { toast('日期不合法'); return; }
+    state.meta.startDate = s; state.meta.endDate = e;
+    saveState(); closeModal(); renderAll(); toast('周期已更新');
+  };
+}
+
+function openRestartDialog() {
+  openModal(
+    '<h3>开始新一轮</h3>' +
+    '<p class="muted" style="font-size:12.5px;margin:0 0 10px">会重置周期起止日期，并清空所有勾选状态；任务内容保留。</p>' +
+    '<div class="field"><label>新一轮开始日期</label><input id="f-start" type="date" value="' + todayStr() + '"></div>' +
+    '<div class="field"><label>新一轮结束日期</label><input id="f-end" type="date" value="' + addDays(todayStr(), 30) + '"></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">开始</button></div>'
+  );
+  modalBody.querySelector('#f-ok').onclick = function(){
+    const s = modalBody.querySelector('#f-start').value;
+    const e = modalBody.querySelector('#f-end').value;
+    if (!s || !e || s > e) { toast('日期不合法'); return; }
+    state.meta.startDate = s;
+    state.meta.endDate = e;
+    state.checks = {};
+    // 把任务日期按偏移量平移到新周期
+    const delta = daysBetween(state.meta.phaseStart, s);
+    state.tasks.forEach(function(t){ t.date = addDays(t.date, delta); });
+    state.meta.phaseStart = s;
+    saveState(); closeModal(); renderAll(); toast('新一轮已开始');
+  };
+}
+
+function openResetDialog() {
+  openModal(
+    '<h3>重置为初始计划</h3>' +
+    '<p class="muted" style="font-size:12.5px;margin:0 0 10px">会删除所有编辑和勾选，恢复成最初的 31 天计划。建议先导出备份。</p>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button><button class="btn danger" id="f-ok">确认重置</button></div>'
+  );
+  modalBody.querySelector('#f-ok').onclick = function(){
+    state = buildSeedState(); saveState(); closeModal(); renderAll(); toast('已重置');
+  };
+}
+
+/* ========== 导入 / 导出 ========== */
+function exportJSON() {
+  const data = {
+    app: 'growth-plan',
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    meta: state.meta,
+    tasks: state.tasks,
+    checks: state.checks
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'growth-plan-backup-' + todayStr() + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('已导出');
+}
+
+function openImportDialog() {
+  openModal(
+    '<h3>导入 JSON</h3>' +
+    '<p class="muted" style="font-size:12.5px;margin:0 0 10px">会覆盖当前任务和勾选。请选择之前导出的 .json 文件。</p>' +
+    '<div class="field"><input type="file" id="f-file" accept="application/json,.json"></div>' +
+    '<div class="actions"><button class="btn" data-close="1">取消</button></div>'
+  );
+  modalBody.querySelector('#f-file').onchange = function(e){
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = function(){
+      try {
+        const obj = JSON.parse(reader.result);
+        if (!obj || !Array.isArray(obj.tasks)) throw new Error('bad');
+        state = {
+          version: 3,
+          meta: obj.meta || Object.assign({}, DEFAULT_META),
+          tasks: obj.tasks,
+          checks: obj.checks || {}
+        };
+        saveState(); closeModal(); renderAll(); toast('已导入');
+      } catch(err) {
+        toast('文件格式不正确');
+      }
+    };
+    reader.readAsText(f);
+  };
+}
+
+/* ========== 视图切换 ========== */
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.querySelectorAll('#tabbar button').forEach(function(b){ b.classList.remove('active'); });
+  const v = document.getElementById('view-' + name);
+  const b = document.querySelector('#tabbar button[data-view="' + name + '"]');
+  if (v) v.classList.add('active');
+  if (b) b.classList.add('active');
+  if (name === 'today') renderToday();
+  if (name === 'cycle') renderCycle();
+  if (name === 'me') renderMe();
+}
+document.querySelectorAll('#tabbar button').forEach(function(b){
+  b.onclick = function(){ switchView(b.getAttribute('data-view')); };
+});
+
+/* ========== 工具 ========== */
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function escapeAttr(s) { return escapeHTML(s).replace(/"/g, '&quot;'); }
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('on'); }, 1600);
+}
+
+function renderAll() {
+  renderToday();
+  renderCycle();
+  renderMe();
+}
+
+/* ========== 启动 ========== */
+loadState();
+renderAll();
+
+// 跨天自动刷新
+let lastDay = todayStr();
+setInterval(function(){
+  const now = todayStr();
+  if (now !== lastDay) { lastDay = now; renderAll(); }
+}, 60000);
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible') {
+    if (todayStr() !== lastDay) { lastDay = todayStr(); renderAll(); }
+  }
+});
+
+// 注册 Service Worker（PWA）
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
