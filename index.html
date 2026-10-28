@@ -7,9 +7,7 @@
 <title>成长计划</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="成长计划">
 <style>
 :root{
   --bg:#f5f7fb;--ink:#141a24;--sub:#5d6878;--line:#e4e8f0;--card:#fff;
@@ -19,43 +17,26 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
-body{
-  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
-  font-size:15px;line-height:1.6;color:var(--ink);background:var(--bg);
-  -webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;
-}
+body{font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;font-size:15px;line-height:1.6;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
 #app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:60px}
 .view{padding:16px 14px calc(16px + var(--sb));display:none}
 .view.active{display:block}
 
-/* 底部 Tab */
-#tabbar{
-  position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;
-  background:rgba(255,255,255,.96);border-top:1px solid var(--line);
-  padding:6px 0 calc(6px + var(--sb));backdrop-filter:blur(12px);
-}
-#tabbar button{
-  flex:1;border:0;background:none;padding:6px 0 2px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  color:var(--sub);font-size:11px;font-family:inherit;
-}
+/* Tab */
+#tabbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:6px 0 calc(6px + var(--sb));backdrop-filter:blur(12px);}
+#tabbar button{flex:1;border:0;background:none;padding:6px 0 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--sub);font-size:11px;font-family:inherit;}
 #tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #tabbar button.active{color:var(--brand)}
 
 /* 通用 */
 h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
-h2{font-size:17px;margin:22px 0 10px;letter-spacing:-.01em}
 h3{font-size:14.5px;margin:0 0 8px}
 .muted{color:var(--sub);font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:14px}
 .bar{height:8px;border-radius:999px;background:#e9edf6;overflow:hidden;margin:8px 0}
 .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;transition:width .35s}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;
-  color:var(--ink);font-size:13.5px;font-family:inherit;cursor:pointer;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:13.5px;font-family:inherit;cursor:pointer;}
 .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
 .btn.danger{background:#fff;color:var(--warn);border-color:rgba(194,65,12,.35)}
 .btn.sm{padding:6px 10px;font-size:12.5px}
@@ -71,118 +52,78 @@ h3{font-size:14.5px;margin:0 0 8px}
 .pill b{color:var(--ink)}
 
 /* 任务卡 */
-.task{
-  display:flex;gap:10px;align-items:flex-start;
-  padding:12px 12px;margin-top:8px;
-  background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
-}
+.task{display:flex;gap:10px;align-items:flex-start;padding:12px 12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);}
 .task.done{opacity:.62}
-.task .cb{
-  flex:none;width:22px;height:22px;border:1.6px solid #c3cddd;border-radius:7px;background:#fff;
-  margin-top:1px;position:relative;cursor:pointer;
-}
+.task .cb{flex:none;width:22px;height:22px;border:1.6px solid #c3cddd;border-radius:7px;background:#fff;margin-top:1px;position:relative;cursor:pointer;}
 .task.done .cb{background:var(--ok);border-color:var(--ok)}
 .task.done .cb::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:12px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
-.task .body{min-width:0;flex:1}
+.task .body{min-width:0;flex:1;cursor:pointer;} /* 点击正文查看详情 */
 .task .t1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .task .title{font-weight:600;font-size:14.5px}
 .task.done .title{text-decoration:line-through;color:#9aa5b5}
 .task .min{font-size:11.5px;color:#7c8797;background:#f2f5fa;border-radius:6px;padding:1px 6px}
-.task .how{font-size:12.8px;color:var(--sub);margin-top:2px}
-.task .std{font-size:12.2px;color:#0b6b51;background:rgba(15,157,118,.07);border-radius:8px;padding:3px 8px;margin-top:6px;display:inline-block}
-.task.done .how,.task.done .std{color:#9aa5b5;text-decoration:line-through}
-.task .cat{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
-.task .more{border:0;background:none;color:#93a0b4;font-size:20px;padding:0 4px;cursor:pointer;line-height:1}
-.empty{padding:24px;text-align:center;color:var(--sub);font-size:13px}
+.task .tag-box{display:inline-block;font-size:11.5px;padding:1px 6px;border-radius:6px;color:#fff;margin-right:4px;}
+.task .how{font-size:12.8px;color:var(--sub);margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.task .more{border:0;background:none;color:#93a0b4;font-size:20px;padding:0 4px;cursor:pointer;line-height:1;}
+.empty{padding:24px;text-align:center;color:var(--sub);font-size:13px;}
 
 /* 周期 */
 .daygrp{margin-top:14px}
-.dayhead{
-  position:sticky;top:0;z-index:5;background:var(--bg);
-  display:flex;align-items:baseline;gap:8px;padding:8px 2px 6px;font-weight:650;
-}
-.dayhead .dt{font-size:14.5px}
-.dayhead .wd{font-size:12px;color:var(--sub);font-weight:400}
+.dayhead{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:8px;padding:8px 2px 6px;font-weight:650;}
+.dayhead .dt{font-size:14.5px}.dayhead .wd{font-size:12px;color:var(--sub);font-weight:400}
 .dayhead .cnt{margin-left:auto;font-size:12px;color:var(--sub);font-weight:400}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin:2px -2px 0;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{
-  flex:none;border:1px solid var(--line);background:#fff;color:var(--sub);
-  border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer;font-family:inherit;
-}
+.chip{flex:none;border:1px solid var(--line);background:#fff;color:var(--sub);border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer;font-family:inherit;}
 .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
 .seqbox{margin-top:16px}
 .seqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:8px}
 .sq{padding:6px 4px;text-align:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:11px;line-height:1.3}
-.sq b{display:block;font-size:11.5px}
-.sq i{font-style:normal;color:#a5b0c0;font-size:10px;letter-spacing:.06em}
-.sq.on{background:rgba(15,157,118,.1);border-color:rgba(15,157,118,.4);color:#0b6b51}
-.sq.on i{color:#0b6b51}
+.sq b{display:block;font-size:11.5px}.sq i{font-style:normal;color:#a5b0c0;font-size:10px;letter-spacing:.06em}
+.sq.on{background:rgba(15,157,118,.1);border-color:rgba(15,157,118,.4);color:#0b6b51}.sq.on i{color:#0b6b51}
 
 /* 我的 */
 .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
-.stat .k{font-size:12px;color:var(--sub)}
-.stat .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--sub)}.stat .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
 .list{list-style:none;padding:0;margin:8px 0 0}
 .list li{padding:10px 0;border-bottom:1px solid #f1f4f9;display:flex;align-items:center;gap:8px;font-size:13.5px}
 .list li:last-child{border-bottom:0}
 .ph{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f4f9;font-size:13.5px}
 .ph:last-child{border-bottom:0}
-.ph .nm{flex:1}
-.ph .pg{width:100px;height:6px;border-radius:999px;background:#e9edf6;overflow:hidden}
-.ph .pg i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.ph .nm{flex:1}.ph .pg{width:100px;height:6px;border-radius:999px;background:#e9edf6;overflow:hidden}.ph .pg i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
 .ph .v{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
 .searchbox{display:flex;gap:8px;margin-top:8px}
-.searchbox input{
-  flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
-  font-size:14px;font-family:inherit;background:#fff;color:var(--ink);
-}
-.results li{cursor:pointer}
-.results li:hover{background:#fafbfe}
+.searchbox input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);font-size:14px;font-family:inherit;background:#fff;color:var(--ink);}
+.results li{cursor:pointer}.results li:hover{background:#fafbfe}
 
-/* Modal */
+/* Modal & Form */
 #modal-root{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center}
 #modal-root.on{display:flex}
 .mask{position:absolute;inset:0;background:rgba(15,20,30,.45)}
-.modal{
-  position:relative;width:100%;max-width:520px;background:#fff;border-radius:18px 18px 0 0;
-  padding:16px 16px calc(16px + var(--sb));max-height:88dvh;overflow-y:auto;
-  box-shadow:0 -10px 30px -8px rgba(0,0,0,.2);
-  animation:up .2s ease-out;
-}
+.modal{position:relative;width:100%;max-width:520px;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + var(--sb));max-height:88dvh;overflow-y:auto;box-shadow:0 -10px 30px -8px rgba(0,0,0,.2);animation:up .2s ease-out;}
 @keyframes up{from{transform:translateY(20px);opacity:.4}to{transform:none;opacity:1}}
 .modal h3{margin:0 0 10px;font-size:16px}
 .field{margin:10px 0}
 .field label{display:block;font-size:12.5px;color:var(--sub);margin-bottom:4px}
-.field input,.field select,.field textarea{
-  width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line);
-  font-size:14px;font-family:inherit;color:var(--ink);background:#fff;
-}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line);font-size:14px;font-family:inherit;color:var(--ink);background:#fff;}
 .field textarea{min-height:64px;resize:vertical}
-.field .row{gap:8px}
-.field .row>*{flex:1}
+.field .row{gap:8px}.field .row>*{flex:1}
 .weekd{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-.weekd button{
-  width:40px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fff;
-  color:var(--sub);font-family:inherit;font-size:12.5px;cursor:pointer;
-}
+.weekd button{width:40px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--sub);font-family:inherit;font-size:12.5px;cursor:pointer;}
 .weekd button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 
-/* 一键回顶 & Toast */
-#back-to-top {
-  position: fixed; right: 16px; bottom: 80px; width: 44px; height: 44px;
-  border-radius: 50%; background: var(--brand); color: #fff; font-size: 20px;
-  border: none; box-shadow: 0 4px 12px rgba(75,92,240,.3);
-  display: none; align-items: center; justify-content: center; z-index: 90;
-}
-#back-to-top.show { display: flex; }
-#toast{
-  position:fixed;left:50%;bottom:96px;transform:translateX(-50%);
-  background:rgba(20,26,36,.92);color:#fff;padding:8px 14px;border-radius:999px;
-  font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;
-}
+/* 详情页专用 */
+.detail-row{margin-bottom:12px;font-size:14px;line-height:1.6;}
+.detail-label{font-size:12px;color:var(--sub);margin-bottom:2px;}
+.detail-val{font-weight:500;}
+.detail-box{background:#f8fafc;padding:10px;border-radius:8px;font-size:13.5px;color:#334155;margin-top:2px;white-space:pre-wrap;}
+
+/* 工具 */
+#back-to-top{position:fixed;right:16px;bottom:80px;width:44px;height:44px;border-radius:50%;background:var(--brand);color:#fff;font-size:20px;border:none;box-shadow:0 4px 12px rgba(75,92,240,.3);display:none;align-items:center;justify-content:center;z-index:90;}
+#back-to-top.show{display:flex;}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(20,26,36,.92);color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
 #toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -192,43 +133,28 @@ h3{font-size:14.5px;margin:0 0 8px}
   <section id="view-today" class="view active"></section>
   <section id="view-cycle" class="view"></section>
   <section id="view-me" class="view"></section>
-
   <nav id="tabbar">
-    <button data-view="today" class="active" aria-label="今日">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
-      <span>今日</span>
-    </button>
-    <button data-view="cycle" aria-label="周期">
-      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-      <span>周期</span>
-    </button>
-    <button data-view="me" aria-label="我的">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
-      <span>我的</span>
-    </button>
+    <button data-view="today" class="active"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><span>今日</span></button>
+    <button data-view="cycle"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg><span>周期</span></button>
+    <button data-view="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
   </nav>
 </div>
 <button id="back-to-top" aria-label="回到顶部">↑</button>
-
 <div id="modal-root"><div class="mask" data-close="1"></div><div class="modal" id="modal-body"></div></div>
 <div id="toast"></div>
 
 <script>
-/* ========== 常量 ========== */
-const STORE_KEY = 'growth-plan:2026-10:v4';
+const STORE_KEY = 'growth-plan:2026-10:v5';
 const DEFAULT_META = { appTitle:'四周成长周期计划', startDate:'2026-10-16', endDate:'2026-11-15', phaseStart:'2026-10-19' };
 const PHASES = [
-  { name:'准备期', start:'2026-10-16', end:'2026-10-18' },
-  { name:'第 1 周期', start:'2026-10-19', end:'2026-10-25' },
-  { name:'第 2 周期', start:'2026-10-26', end:'2026-11-01' },
-  { name:'第 3 周期', start:'2026-11-02', end:'2026-11-08' },
+  { name:'准备期', start:'2026-10-16', end:'2026-10-18' }, { name:'第 1 周期', start:'2026-10-19', end:'2026-10-25' },
+  { name:'第 2 周期', start:'2026-10-26', end:'2026-11-01' }, { name:'第 3 周期', start:'2026-11-02', end:'2026-11-08' },
   { name:'第 4 周期', start:'2026-11-09', end:'2026-11-15' }
 ];
 const CAT_LABEL = { base:'基础', sk:'护肤', sport:'运动', exam:'考试', custom:'自定义' };
 const CAT_COLOR = { base:'#4b5cf0', sk:'#0f9d76', sport:'#dc2626', exam:'#0891b2', custom:'#6b7280' };
 const WD_CN = ['日','一','二','三','四','五','六'];
 
-/* ========== 种子数据 ========== */
 const SEED_ROWS = [
   ['2026-10-16','sk','睡前 · 阿达帕林 第 1 次',10,'洁面后等皮肤完全干 → 全脸薄薄一层，避开眼周、唇周、鼻翼褶皱 → 叠一层面霜 → 凡士林涂关节和脚跟','完成标准 · 涂完在日历上圈住 10/16：以后所有“第几天”都从这里数'],
   ['2026-10-16','sk','把顺序搬到手机日历',10,'截图这页存相册并贴在书桌前；新建一条重复提醒：每周一＋每周四 21:30（第一次落在 10/19），并手动补上 10/16 当晚','完成标准 · 日历里有一条“每周一＋每周四 21:30”的重复提醒并开了通知'],
@@ -413,21 +339,13 @@ const SEED_ROWS = [
   ['2026-11-15','base','更新下一周期锚点',3,'看“31 天护肤序列核对表”：已过的格子全勾上，再抄出未来 3 个日期','完成标准 · 核对表无空档，未来 3 个日期在手机日历里']
 ];
 
-/* ========== 状态 ========== */
 let state = null;
 function uid(p){ return (p||'t')+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
-
 function buildSeedState() {
-  const tasks = SEED_ROWS.map(function(row, i) {
-    return { id:'seed-'+i, date:row[0], category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null };
-  });
+  const tasks = SEED_ROWS.map((row, i) => ({ id:'seed-'+i, date:row[0], category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null }));
   const map = {};
-  tasks.forEach(function(t) {
-    const k = t.category + '||' + t.title;
-    if (!map[k]) map[k] = 'g-' + Math.random().toString(36).slice(2, 9);
-    t.groupId = map[k];
-  });
-  return { version: 4, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
+  tasks.forEach(t => { const k = t.category + '||' + t.title; if (!map[k]) map[k] = 'g-' + Math.random().toString(36).slice(2, 9); t.groupId = map[k]; });
+  return { version: 5, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
 }
 function loadState() {
   try {
@@ -437,13 +355,11 @@ function loadState() {
     if (!s || !s.tasks) throw new Error('bad');
     if (!s.meta) s.meta = Object.assign({}, DEFAULT_META);
     if (!s.checks) s.checks = {};
-    s.version = 4;
-    state = s;
+    s.version = 5; state = s;
   } catch(e) { state = buildSeedState(); saveState(); }
 }
 function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {} }
 
-/* ========== 日期工具 ========== */
 function pad2(n){ return n<10?'0'+n:''+n; }
 function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
 function parseD(s){ const a=s.split('-').map(Number); return new Date(a[0],a[1]-1,a[2]); }
@@ -454,10 +370,7 @@ function addDays(s,n){ const d=parseD(s); d.setDate(d.getDate()+n); return d.get
 function cmpDate(a,b){ return a<b?-1:a>b?1:0; }
 function daysBetween(a,b){ return Math.round((parseD(b)-parseD(a))/86400000); }
 
-/* ========== 计算 ========== */
-function tasksOn(date) {
-  return state.tasks.filter(t => t.date === date).sort((a,b) => (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh'));
-}
+function tasksOn(date) { return state.tasks.filter(t => t.date === date).sort((a,b) => (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh')); }
 function allDates() { const set = {}; state.tasks.forEach(t => set[t.date] = 1); return Object.keys(set).sort(); }
 function isChecked(t) { return !!state.checks[t.id]; }
 function toggleCheck(t) { if (state.checks[t.id]) delete state.checks[t.id]; else state.checks[t.id] = 1; saveState(); }
@@ -465,87 +378,50 @@ function progressOn(date) { const ts = tasksOn(date); const done = ts.filter(isC
 function overallProgress() { const total = state.tasks.length; const done = state.tasks.filter(isChecked).length; return { total: total, done: done, pct: total ? Math.round(done/total*100) : 0 }; }
 function phaseProgress(p) { const ts = state.tasks.filter(t => t.date >= p.start && t.date <= p.end); const done = ts.filter(isChecked).length; return { total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 }; }
 function streakDays() {
-  let cur = todayStr();
-  const todayP = progressOn(cur);
+  let cur = todayStr(); const todayP = progressOn(cur);
   if (todayP.total > 0 && todayP.done < todayP.total) cur = addDays(cur, -1);
   let n = 0;
   for (let i = 0; i < 400; i++) {
-    const p = progressOn(cur);
-    if (p.total === 0) { cur = addDays(cur, -1); continue; }
+    const p = progressOn(cur); if (p.total === 0) { cur = addDays(cur, -1); continue; }
     if (p.done === p.total) { n++; cur = addDays(cur, -1); } else break;
-  }
-  return n;
+  } return n;
 }
-function weekRangeFor(dateStr) {
-  const d = parseD(dateStr);
-  const wd = d.getDay();
-  const start = addDays(dateStr, -(wd === 0 ? 6 : wd - 1));
-  return [start, addDays(start, 6)];
-}
-function weekProgress(dateStr) {
-  const r = weekRangeFor(dateStr);
-  const ts = state.tasks.filter(t => t.date >= r[0] && t.date <= r[1]);
-  const done = ts.filter(isChecked).length;
-  return { from: r[0], to: r[1], total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 };
-}
+function weekRangeFor(dateStr) { const d = parseD(dateStr); const wd = d.getDay(); const start = addDays(dateStr, -(wd === 0 ? 6 : wd - 1)); return [start, addDays(start, 6)]; }
+function weekProgress(dateStr) { const r = weekRangeFor(dateStr); const ts = state.tasks.filter(t => t.date >= r[0] && t.date <= r[1]); const done = ts.filter(isChecked).length; return { from: r[0], to: r[1], total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 }; }
 
 /* ========== 视图：今日 ========== */
 function renderToday() {
-  const el = document.getElementById('view-today');
-  const today = todayStr();
-  const m = state.meta;
-  if (today > m.endDate) {
-    el.innerHTML = '<h1>周期已结束</h1><p class="muted">共 ' + state.tasks.length + ' 项任务，已完成 ' + overallProgress().done + ' 项。</p><div class="card pad" style="margin-top:14px"><h3>收尾</h3><p class="muted" style="margin:0 0 10px">建议先导出备份，再决定是否开始新一轮。</p><div class="row"><button class="btn primary" id="btn-export-end">导出 JSON 备份</button><button class="btn" id="btn-restart">开始新一轮</button></div></div><div class="card pad" style="margin-top:12px"><h3>本周期总览</h3>' + renderPhaseListHTML() + '</div>';
-    el.querySelector('#btn-export-end').onclick = exportJSON;
-    el.querySelector('#btn-restart').onclick = openRestartDialog;
-    return;
-  }
-  if (today < m.startDate) {
-    el.innerHTML = '<h1>周期还没开始</h1><p class="muted">本周期从 ' + m.startDate + ' 开始。今天是 ' + today + '。</p><div class="card pad" style="margin-top:14px"><p class="muted" style="margin:0 0 10px">可以先看整个周期的任务，也可以把开始日期改到今天。</p><div class="row"><button class="btn primary" id="btn-shift">把开始日期改到今天</button></div></div>';
-    el.querySelector('#btn-shift').onclick = () => { state.meta.startDate = today; saveState(); renderAll(); toast('开始日期已更新'); };
-    return;
-  }
-  const ts = tasksOn(today);
-  const p = progressOn(today);
-  let html = '<div class="today-head"><span class="today-date">' + fmtCN(today) + '</span><span class="today-week">' + wdCN(today) + '</span></div><div class="today-stat"><span class="pill">今日 <b>' + p.done + '/' + p.total + '</b></span><span class="pill">完成率 <b>' + p.pct + '%</b></span><span class="pill">连续打卡 <b>' + streakDays() + '</b> 天</span></div><div class="bar"><i style="width:' + p.pct + '%"></i></div>';
-  if (!ts.length) {
-    html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
-  } else {
-    html += '<div id="today-tasks">';
-    ts.forEach(t => html += renderTaskHTML(t, 'today'));
-    html += '</div><div style="margin-top:14px;text-align:center"><button class="btn" id="btn-add-today">+ 添加今日任务</button></div>';
-  }
-  el.innerHTML = html;
-  el.querySelector('#btn-add-today').onclick = () => openTaskEditor(null, { date: today });
-  bindTaskEvents(el, 'today');
+  const el = document.getElementById('view-today'); const today = todayStr(); const m = state.meta;
+  if (today > m.endDate) { el.innerHTML = '<h1>周期已结束</h1><div class="card pad"><button class="btn primary" id="btn-restart">开始新一轮</button></div>'; el.querySelector('#btn-restart').onclick = openRestartDialog; return; }
+  if (today < m.startDate) { el.innerHTML = '<h1>周期还没开始</h1><div class="card pad"><button class="btn primary" id="btn-shift">改开始日期到今天</button></div>'; el.querySelector('#btn-shift').onclick = () => { state.meta.startDate = today; saveState(); renderAll(); }; return; }
+  const ts = tasksOn(today); const p = progressOn(today);
+  let html = '<div class="today-head"><span class="today-date">' + fmtCN(today) + '</span><span class="today-week">' + wdCN(today) + '</span></div><div class="today-stat"><span class="pill">今日 <b>' + p.done + '/' + p.total + '</b></span><span class="pill">连续打卡 <b>' + streakDays() + '</b> 天</span></div><div class="bar"><i style="width:' + p.pct + '%"></i></div>';
+  if (!ts.length) html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
+  else { html += '<div id="today-tasks">'; ts.forEach(t => html += renderTaskHTML(t)); html += '</div><div style="margin-top:14px;text-align:center"><button class="btn" id="btn-add-today">+ 添加今日任务</button></div>'; }
+  el.innerHTML = html; el.querySelector('#btn-add-today').onclick = () => openTaskEditor(null, { date: today }); bindTaskEvents(el);
 }
 
 /* ========== 视图：周期 ========== */
 let cycleFilter = 'all', cycleSearch = '';
 function renderCycle() {
-  const el = document.getElementById('view-cycle');
-  const m = state.meta;
-  let html = '<h1>周期</h1><p class="muted">' + m.startDate + ' – ' + m.endDate + ' · 共 ' + state.tasks.length + ' 项</p><div class="row" style="margin-top:8px"><button class="btn sm" id="btn-edit-cycle">修改周期起止</button><button class="btn sm primary" id="btn-add-range">+ 添加任务</button></div><div class="searchbox"><input id="cycle-search" type="search" placeholder="搜索任务标题…" value="' + escapeAttr(cycleSearch) + '"></div><div class="chips" style="margin-top:10px"><button class="chip' + (cycleFilter==='all'?' on':'') + '" data-f="all">全部</button>';
+  const el = document.getElementById('view-cycle'); const m = state.meta;
+  let html = '<h1>周期</h1><p class="muted">' + m.startDate + ' – ' + m.endDate + ' · 共 ' + state.tasks.length + ' 项</p><div class="row" style="margin-top:8px"><button class="btn sm" id="btn-edit-cycle">修改周期起止</button><button class="btn sm primary" id="btn-add-range">+ 添加任务</button></div><div class="searchbox"><input id="cycle-search" type="search" placeholder="搜索标题…" value="' + escapeAttr(cycleSearch) + '"></div><div class="chips" style="margin-top:10px"><button class="chip' + (cycleFilter==='all'?' on':'') + '" data-f="all">全部</button>';
   PHASES.forEach((p, i) => html += '<button class="chip' + (cycleFilter===String(i)?' on':'') + '" data-f="' + i + '">' + p.name + '</button>');
-  html += '</div><div class="seqbox card pad"><h3>阿达帕林核对（只读）</h3><p class="muted" style="margin:0;font-size:12.5px">跟着任务勾选自动更新，共 ' + countAdaparin() + ' 次。</p><div class="seqgrid">' + renderSeqGrid() + '</div></div>';
+  html += '</div><div class="seqbox card pad"><h3>阿达帕林核对（只读）</h3><div class="seqgrid">' + renderSeqGrid() + '</div></div>';
   const dates = filteredDates();
   if (!dates.length) html += '<div class="empty">没有匹配的任务</div>';
-  else {
-    dates.forEach(d => {
-      const ts = tasksOn(d).filter(taskMatchesFilter);
-      if (!ts.length) return;
-      const p = progressOn(d);
-      html += '<div class="daygrp"><div class="dayhead"><span class="dt">' + fmtCN(d) + '</span><span class="wd">' + wdCN(d) + '</span><span class="cnt">' + p.done + '/' + p.total + '</span></div>';
-      ts.forEach(t => html += renderTaskHTML(t, 'cycle'));
-      html += '</div>';
-    });
-  }
+  else dates.forEach(d => {
+    const ts = tasksOn(d).filter(taskMatchesFilter); if (!ts.length) return;
+    const p = progressOn(d);
+    html += '<div class="daygrp"><div class="dayhead"><span class="dt">' + fmtCN(d) + '</span><span class="wd">' + wdCN(d) + '</span><span class="cnt">' + p.done + '/' + p.total + '</span></div>';
+    ts.forEach(t => html += renderTaskHTML(t)); html += '</div>';
+  });
   el.innerHTML = html;
   el.querySelector('#btn-edit-cycle').onclick = openEditCycleDialog;
   el.querySelector('#btn-add-range').onclick = openAddRangeDialog;
   el.querySelector('#cycle-search').addEventListener('input', e => { cycleSearch = e.target.value.trim(); renderCycle(); });
   el.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { cycleFilter = b.getAttribute('data-f'); renderCycle(); });
-  bindTaskEvents(el, 'cycle');
+  bindTaskEvents(el);
 }
 function taskMatchesFilter(t) {
   if (cycleFilter !== 'all') { const p = PHASES[Number(cycleFilter)]; if (p && (t.date < p.start || t.date > p.end)) return false; }
@@ -558,71 +434,95 @@ function filteredDates() {
   if (cycleSearch) ds = ds.filter(d => tasksOn(d).some(taskMatchesFilter));
   return ds;
 }
-function countAdaparin() { return state.tasks.filter(t => t.category === 'sk' && /阿达帕林/.test(t.title)).length; }
 function renderSeqGrid() {
   const adap = state.tasks.filter(t => t.category === 'sk' && /阿达帕林/.test(t.title)).sort((a,b) => cmpDate(a.date, b.date));
-  if (!adap.length) return '<div class="muted" style="grid-column:1/-1;font-size:12.5px">还没有阿达帕林任务</div>';
-  return adap.map(t => '<div class="sq' + (isChecked(t)?' on':'') + '" title="' + escapeAttr(t.title) + '"><b>' + fmtCN(t.date) + '</b><i>第' + (adap.indexOf(t)+1) + '次</i></div>').join('');
+  if (!adap.length) return '<div class="muted" style="grid-column:1/-1;font-size:12.5px">无</div>';
+  return adap.map(t => '<div class="sq' + (isChecked(t)?' on':'') + '"><b>' + fmtCN(t.date) + '</b><i>第' + (adap.indexOf(t)+1) + '次</i></div>').join('');
 }
 
 /* ========== 视图：我的 ========== */
 function renderMe() {
-  const el = document.getElementById('view-me');
-  const o = overallProgress(), streak = streakDays(), wk = weekProgress(todayStr()), today = todayStr();
-  let html = '<h1>我的</h1><div class="statgrid"><div class="stat"><div class="k">总进度</div><div class="v">' + o.pct + '%</div><div class="muted" style="font-size:12px">' + o.done + ' / ' + o.total + '</div></div><div class="stat"><div class="k">连续打卡</div><div class="v">' + streak + '<span style="font-size:13px;font-weight:400;color:var(--sub)"> 天</span></div><div class="muted" style="font-size:12px">今天往前数</div></div><div class="stat"><div class="k">今日完成</div><div class="v">' + progressOn(today).done + '<span style="font-size:13px;font-weight:400;color:var(--sub)">/' + progressOn(today).total + '</span></div><div class="muted" style="font-size:12px">' + fmtCN(today) + ' ' + wdCN(today) + '</div></div><div class="stat"><div class="k">本周完成率</div><div class="v">' + wk.pct + '%</div><div class="muted" style="font-size:12px">' + fmtCN(wk.from) + ' – ' + fmtCN(wk.to) + '</div></div></div>';
+  const el = document.getElementById('view-me'); const o = overallProgress(), streak = streakDays(), wk = weekProgress(todayStr()), today = todayStr();
+  let html = '<h1>我的</h1><div class="statgrid"><div class="stat"><div class="k">总进度</div><div class="v">' + o.pct + '%</div><div class="muted" style="font-size:12px">' + o.done + ' / ' + o.total + '</div></div><div class="stat"><div class="k">连续打卡</div><div class="v">' + streak + '<span style="font-size:13px;font-weight:400;color:var(--sub)"> 天</span></div></div><div class="stat"><div class="k">今日完成</div><div class="v">' + progressOn(today).done + '<span style="font-size:13px;font-weight:400;color:var(--sub)">/' + progressOn(today).total + '</span></div></div><div class="stat"><div class="k">本周完成率</div><div class="v">' + wk.pct + '%</div></div></div>';
   html += '<div class="card pad" style="margin-top:12px"><h3>五个阶段</h3>' + renderPhaseListHTML() + '</div><div class="card pad" style="margin-top:12px"><h3>快捷操作</h3><div class="row"><button class="btn" id="btn-check-today">勾选今日全部</button><button class="btn" id="btn-uncheck-today">取消今日全部</button></div></div>';
-  html += '<div class="card pad" style="margin-top:12px"><h3>搜索</h3><div class="searchbox"><input id="me-search" type="search" placeholder="输入标题关键词，回车搜索"></div><ul class="list results" id="me-results"></ul></div>';
-  // 换色
-  html += '<div class="card pad" style="margin-top:12px"><h3>页面背景颜色</h3><div class="row"><input type="color" id="bg-color-picker" style="width:50px;height:36px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer;" value="' + (localStorage.getItem('custom-bg') || '#f5f7fb') + '"><span class="muted" style="font-size:12px">点击色块选择颜色，立即生效</span></div></div>';
-  // 批量导入
-  html += '<div class="card pad" style="margin-top:12px"><h3>批量导入计划</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">让 AI 按“日期 | 标签 | 标题 | 时长 | 怎么做 | 完成标准”的格式输出，直接粘贴进来。</p><button class="btn primary" id="btn-bulk-import">粘贴文本生成任务</button></div>';
-  // 数据管理
-  html += '<div class="card pad" style="margin-top:12px"><h3>数据管理</h3><div class="row"><button class="btn primary" id="btn-export">导出 JSON</button><button class="btn" id="btn-import">导入 JSON</button><button class="btn danger" id="btn-reset">重置为初始计划</button></div><p class="muted" style="margin:10px 0 0;font-size:12px">导出文件建议存到网盘或发给自己；导入会覆盖当前数据。</p></div>';
-  html += '<div class="card pad" style="margin-top:12px"><h3>关于</h3><p class="muted" style="margin:0;font-size:12.5px">版本 v4 · 数据存于本机浏览器 localStorage，换设备不同步。清理浏览器数据会丢失勾选，请定期导出。</p></div>';
+  html += '<div class="card pad" style="margin-top:12px"><h3>搜索</h3><div class="searchbox"><input id="me-search" type="search" placeholder="输入关键词搜索"></div><ul class="list results" id="me-results"></ul></div>';
+  html += '<div class="card pad" style="margin-top:12px"><h3>页面背景颜色</h3><div class="row"><input type="color" id="bg-color-picker" style="width:50px;height:36px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer;" value="' + (localStorage.getItem('custom-bg') || '#f5f7fb') + '"><span class="muted" style="font-size:12px">点击色块立即生效</span></div></div>';
+  html += '<div class="card pad" style="margin-top:12px"><h3>批量导入计划</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">格式：日期 | 标签 | 标题 | 时长 | 怎么做 | 完成标准</p><button class="btn primary" id="btn-bulk-import">粘贴文本生成任务</button></div>';
+  html += '<div class="card pad" style="margin-top:12px"><h3>数据管理</h3><div class="row"><button class="btn primary" id="btn-export">导出 JSON</button><button class="btn" id="btn-import">导入 JSON</button><button class="btn danger" id="btn-reset">重置为初始计划</button></div></div>';
   el.innerHTML = html;
   el.querySelector('#btn-check-today').onclick = () => { tasksOn(today).forEach(t => { if (!isChecked(t)) toggleCheck(t); }); renderAll(); toast('已勾选今日全部'); };
   el.querySelector('#btn-uncheck-today').onclick = () => { tasksOn(today).forEach(t => { if (isChecked(t)) toggleCheck(t); }); renderAll(); toast('已取消今日全部'); };
-  el.querySelector('#btn-export').onclick = exportJSON;
-  el.querySelector('#btn-import').onclick = openImportDialog;
-  el.querySelector('#btn-reset').onclick = openResetDialog;
-  el.querySelector('#btn-bulk-import').onclick = openBulkImportDialog;
-  el.querySelector('#bg-color-picker').addEventListener('input', e => { const c = e.target.value; document.documentElement.style.setProperty('--bg', c); localStorage.setItem('custom-bg', c); });
+  el.querySelector('#btn-export').onclick = exportJSON; el.querySelector('#btn-import').onclick = openImportDialog; el.querySelector('#btn-reset').onclick = openResetDialog; el.querySelector('#btn-bulk-import').onclick = openBulkImportDialog;
+  el.querySelector('#bg-color-picker').addEventListener('input', e => { document.documentElement.style.setProperty('--bg', e.target.value); localStorage.setItem('custom-bg', e.target.value); });
   el.querySelector('#me-search').addEventListener('input', e => {
     const q = e.target.value.trim(); const list = document.getElementById('me-results');
     if (!q) { list.innerHTML = ''; return; }
     const hits = state.tasks.filter(t => t.title.toLowerCase().indexOf(q.toLowerCase()) >= 0).slice(0, 30);
-    list.innerHTML = hits.map(t => '<li data-id="' + t.id + '"><span class="cat" style="background:' + (t.tagColor||CAT_COLOR[t.category]||CAT_COLOR.custom) + '"></span>' + escapeHTML(t.title) + '<span class="spacer"></span><span class="muted" style="font-size:12px">' + fmtCN(t.date) + '</span></li>').join('') || '<li class="muted" style="border:0">没有匹配</li>';
-    list.querySelectorAll('li[data-id]').forEach(li => { li.onclick = () => { const t = state.tasks.find(x => x.id === li.getAttribute('data-id')); if(t){ switchView('cycle'); cycleFilter = 'all'; cycleSearch = t.title; renderCycle(); setTimeout(() => { const grps = document.querySelectorAll('#view-cycle .dayhead .dt'); for (const g of grps) { if (g.textContent === fmtCN(t.date)) { g.parentElement.scrollIntoView({behavior:'smooth', block:'start'}); break; } } }, 80); } }; });
+    list.innerHTML = hits.map(t => '<li data-id="' + t.id + '"><span class="cat" style="background:' + (t.tagColor||'#6b7280') + '"></span>' + escapeHTML(t.title) + '<span class="spacer"></span><span class="muted" style="font-size:12px">' + fmtCN(t.date) + '</span></li>').join('') || '<li class="muted" style="border:0">没有匹配</li>';
+    list.querySelectorAll('li[data-id]').forEach(li => { li.onclick = () => { const t = state.tasks.find(x => x.id === li.getAttribute('data-id')); if(t){ switchView('cycle'); cycleFilter = 'all'; cycleSearch = t.title; renderCycle(); } }; });
   });
 }
-function renderPhaseListHTML() {
-  return PHASES.map(p => { const pr = phaseProgress(p); return '<div class="ph"><span class="nm">' + p.name + '<br><span class="muted" style="font-size:11.5px">' + fmtCN(p.start) + ' – ' + fmtCN(p.end) + '</span></span><span class="pg"><i style="width:' + pr.pct + '%"></i></span><span class="v">' + pr.done + '/' + pr.total + '</span></div>'; }).join('');
-}
+function renderPhaseListHTML() { return PHASES.map(p => { const pr = phaseProgress(p); return '<div class="ph"><span class="nm">' + p.name + '</span><span class="pg"><i style="width:' + pr.pct + '%"></i></span><span class="v">' + pr.done + '/' + pr.total + '</span></div>'; }).join(''); }
 
-/* ========== 任务渲染 ========== */
-function renderTaskHTML(t, ctx) {
+/* ========== 任务渲染与绑定 ========== */
+function renderTaskHTML(t) {
   const done = isChecked(t);
-  const cat = t.tagColor || CAT_COLOR[t.category] || CAT_COLOR.custom;
-  return '<div class="task' + (done ? ' done' : '') + '" data-id="' + t.id + '"><span class="cb" data-act="toggle"></span><div class="body"><div class="t1"><span class="title"><span class="cat" style="background:' + cat + '"></span>' + escapeHTML(t.title) + '</span><span class="min">' + t.minutes + 'min</span></div>' + (t.how ? '<div class="how">' + escapeHTML(t.how) + '</div>' : '') + (t.std ? '<div class="std">' + escapeHTML(t.std) + '</div>' : '') + '</div><button class="more" data-act="more" aria-label="更多">⋯</button></div>';
+  const cat = t.tagColor || '#6b7280';
+  const tagName = t.tag || '自定义';
+  let timeStr = t.startTime && t.endTime ? `<span class="min" style="background:rgba(75,92,240,.1);color:var(--brand);">${t.startTime}-${t.endTime}</span>` : `<span class="min">${t.minutes}min</span>`;
+  return `<div class="task${done?' done':''}" data-id="${t.id}">
+    <span class="cb" data-act="toggle"></span>
+    <div class="body" data-act="detail">
+      <div class="t1">
+        <span class="tag-box" style="background:${cat}">${escapeHTML(tagName)}</span>
+        <span class="title">${escapeHTML(t.title)}</span>
+        ${timeStr}
+      </div>
+      <div class="how">${escapeHTML(t.how||'无具体步骤')}</div>
+    </div>
+    <button class="more" data-act="more">⋯</button>
+  </div>`;
 }
-function bindTaskEvents(root, ctx) {
+function bindTaskEvents(root) {
   root.querySelectorAll('.task').forEach(el => {
-    const id = el.getAttribute('data-id'); const t = state.tasks.find(x => x.id === id);
-    if (!t) return;
+    const id = el.getAttribute('data-id'); const t = state.tasks.find(x => x.id === id); if (!t) return;
     el.querySelector('[data-act="toggle"]').onclick = () => { toggleCheck(t); renderAll(); };
-    el.querySelector('[data-act="more"]').onclick = e => { e.stopPropagation(); openTaskMenu(t, ctx); };
+    el.querySelector('[data-act="more"]').onclick = e => { e.stopPropagation(); openTaskMenu(t); };
+    el.querySelector('[data-act="detail"]').onclick = () => openTaskDetail(t);
   });
 }
 
-/* ========== 弹窗 ========== */
+/* ========== 弹窗与逻辑 ========== */
 const modalRoot = document.getElementById('modal-root'), modalBody = document.getElementById('modal-body');
 function openModal(html) { modalBody.innerHTML = html; modalRoot.classList.add('on'); }
 function closeModal() { modalRoot.classList.remove('on'); modalBody.innerHTML = ''; }
 modalRoot.addEventListener('click', e => { if (e.target.getAttribute && e.target.getAttribute('data-close')) closeModal(); });
 
-function openTaskMenu(t, ctx) {
-  let html = '<h3>' + escapeHTML(t.title) + '</h3><p class="muted" style="margin:0 0 10px;font-size:12.5px">' + fmtCN(t.date) + ' ' + wdCN(t.date) + ' · ' + t.minutes + 'min</p><div class="row"><button class="btn primary" data-a="edit">编辑</button><button class="btn" data-a="date">改日期</button><button class="btn danger" data-a="del">删除这一条</button>';
-  if (t.groupId) { const n = state.tasks.filter(x => x.groupId === t.groupId).length; if (n > 1) html += '<button class="btn danger" data-a="delgroup">删除这一系列（' + n + ' 条）</button>'; }
+function openTaskDetail(t) {
+  let seriesInfo = '';
+  if (t.groupId) {
+    const siblings = state.tasks.filter(x => x.groupId === t.groupId).sort((a,b) => cmpDate(a.date, b.date));
+    if (siblings.length > 1) {
+      seriesInfo = `<div class="detail-row"><div class="detail-label">系列跨度</div><div class="detail-val">从 ${siblings[0].date} 到 ${siblings[siblings.length-1].date}（共 ${siblings.length} 天）</div></div>`;
+    }
+  }
+  let timeInfo = t.startTime && t.endTime ? `<div class="detail-row"><div class="detail-label">具体时间</div><div class="detail-val" style="color:var(--brand);font-weight:bold;">${t.startTime} - ${t.endTime} (${t.minutes}分钟)</div></div>` : `<div class="detail-row"><div class="detail-label">预计时长</div><div class="detail-val">${t.minutes} 分钟</div></div>`;
+
+  openModal(`<h3>任务详情</h3>
+    <div class="detail-row"><div class="detail-label">标题</div><div class="detail-val" style="font-size:16px;">${escapeHTML(t.title)}</div></div>
+    <div class="detail-row"><div class="detail-label">标签</div><div class="detail-val"><span class="tag-box" style="background:${t.tagColor||'#6b7280'}">${escapeHTML(t.tag||'自定义')}</span></div></div>
+    <div class="detail-row"><div class="detail-label">日期</div><div class="detail-val">${t.date} (${wdCN(t.date)})</div></div>
+    ${seriesInfo}
+    ${timeInfo}
+    <div class="detail-row"><div class="detail-label">详细步骤</div><div class="detail-box">${escapeHTML(t.how || '未填写')}</div></div>
+    <div class="detail-row"><div class="detail-label">完成标准</div><div class="detail-box" style="background:rgba(15,157,118,.07);color:#0b6b51;">${escapeHTML(t.std || '未填写')}</div></div>
+    <div class="actions"><button class="btn primary" data-close="1">关闭</button></div>
+  `);
+}
+
+function openTaskMenu(t) {
+  let html = '<h3>' + escapeHTML(t.title) + '</h3><div class="row"><button class="btn primary" data-a="edit">编辑</button><button class="btn" data-a="date">改日期</button><button class="btn danger" data-a="del">删除</button>';
+  if (t.groupId) { const n = state.tasks.filter(x => x.groupId === t.groupId).length; if (n > 1) html += '<button class="btn danger" data-a="delgroup">删整组(' + n + '条)</button>'; }
   html += '</div>'; openModal(html);
   modalBody.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
@@ -634,23 +534,53 @@ function openTaskMenu(t, ctx) {
     };
   });
 }
+
 function openChangeDateDialog(t) {
   openModal('<h3>改日期</h3><div class="field"><label>新日期</label><input type="date" id="f-date" value="' + t.date + '"></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">保存</button></div>');
   modalBody.querySelector('#f-ok').onclick = () => { const v = modalBody.querySelector('#f-date').value; if (v) { t.date = v; saveState(); closeModal(); renderAll(); toast('日期已改'); } };
 }
+
 function openTaskEditor(id, defaults) {
   const t = id ? state.tasks.find(x => x.id === id) : null;
   const d = t || defaults || {};
-  openModal('<h3>' + (t ? '编辑任务' : '新建任务') + '</h3><div class="field"><label>标题</label><input id="f-title" value="' + escapeAttr(t ? t.title : '新任务') + '"></div><div class="field"><label>标签与颜色</label><div style="display:flex;gap:8px;"><input id="f-tag" style="flex:1;" value="' + escapeAttr(t ? (t.tag||'') : '') + '" placeholder="如：学习、运动"><input id="f-tagcolor" type="color" value="' + (t ? (t.tagColor||'#6b7280') : '#6b7280') + '" style="width:50px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer;"></div></div><div class="field"><label>时长（分钟）</label><input id="f-min" type="number" min="1" value="' + (t ? t.minutes : 20) + '"></div><div class="field"><label>日期</label><input id="f-date" type="date" value="' + (t ? t.date : (d.date || todayStr())) + '"></div><div class="field"><label>怎么做</label><textarea id="f-how">' + escapeHTML(t ? (t.how||'') : '') + '</textarea></div><div class="field"><label>完成标准</label><textarea id="f-std">' + escapeHTML(t ? (t.std||'') : '') + '</textarea></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-save">保存</button></div>');
+  openModal(`<h3>${t ? '编辑任务' : '新建任务'}</h3>
+    <div class="field"><label>标题</label><input id="f-title" value="${escapeAttr(t ? t.title : '新任务')}"></div>
+    <div class="field"><label>标签与颜色</label><div style="display:flex;gap:8px;"><input id="f-tag" style="flex:1;" value="${escapeAttr(t ? (t.tag||'') : '')}" placeholder="如：学习"><input id="f-tagcolor" type="color" value="${t ? (t.tagColor||'#6b7280') : '#6b7280'}" style="width:50px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;"></div></div>
+    <div class="field"><label>具体时间段 (可选)</label><div class="row"><input type="time" id="f-starttime" value="${t ? (t.startTime||'') : ''}"><span>至</span><input type="time" id="f-endtime" value="${t ? (t.endTime||'') : ''}"></div></div>
+    <div class="field"><label>时长(分)</label><input id="f-min" type="number" min="1" value="${t ? t.minutes : 20}"></div>
+    <div class="field"><label>日期</label><input id="f-date" type="date" value="${t ? t.date : (d.date || todayStr())}"></div>
+    <div class="field"><label>怎么做</label><textarea id="f-how">${escapeHTML(t ? (t.how||'') : '')}</textarea></div>
+    <div class="field"><label>完成标准</label><textarea id="f-std">${escapeHTML(t ? (t.std||'') : '')}</textarea></div>
+    <div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-save">保存</button></div>`);
   modalBody.querySelector('#f-save').onclick = () => {
-    const data = { title: modalBody.querySelector('#f-title').value.trim() || '未命名', tag: modalBody.querySelector('#f-tag').value.trim() || '自定义', tagColor: modalBody.querySelector('#f-tagcolor').value, minutes: Math.max(1, parseInt(modalBody.querySelector('#f-min').value, 10) || 1), date: modalBody.querySelector('#f-date').value || todayStr(), how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim() };
+    const data = {
+      title: modalBody.querySelector('#f-title').value.trim() || '未命名',
+      tag: modalBody.querySelector('#f-tag').value.trim() || '自定义',
+      tagColor: modalBody.querySelector('#f-tagcolor').value,
+      startTime: modalBody.querySelector('#f-starttime').value,
+      endTime: modalBody.querySelector('#f-endtime').value,
+      minutes: Math.max(1, parseInt(modalBody.querySelector('#f-min').value, 10) || 1),
+      date: modalBody.querySelector('#f-date').value || todayStr(),
+      how: modalBody.querySelector('#f-how').value.trim(),
+      std: modalBody.querySelector('#f-std').value.trim()
+    };
     if (t) Object.assign(t, data); else state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g'), category:'custom' }, data));
     saveState(); closeModal(); renderAll(); toast('已保存');
   };
 }
+
 function openAddRangeDialog() {
   const start = state.meta.startDate > todayStr() ? state.meta.startDate : todayStr();
-  openModal('<h3>添加持续任务</h3><div class="field"><label>标题</label><input id="f-title" placeholder="例如：晨间拉伸"></div><div class="field"><label>标签与颜色</label><div style="display:flex;gap:8px;"><input id="f-tag" style="flex:1;" value="自定义"><input id="f-tagcolor" type="color" value="#6b7280" style="width:50px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer;"></div></div><div class="field"><label>时长（分钟）</label><input id="f-min" type="number" min="1" value="15"></div><div class="field"><label>从</label><input id="f-from" type="date" value="' + start + '"></div><div class="field"><label>到</label><input id="f-to" type="date" value="' + state.meta.endDate + '"></div><div class="field"><label>星期（不选＝每天）</label><div class="weekd" id="f-wd">' + [1,2,3,4,5,6,0].map(w => '<button type="button" data-w="' + w + '">' + WD_CN[w] + '</button>').join('') + '</div></div><div class="field"><label>怎么做</label><textarea id="f-how"></textarea></div><div class="field"><label>完成标准</label><textarea id="f-std"></textarea></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-add">生成任务</button></div>');
+  openModal(`<h3>添加持续任务</h3>
+    <div class="field"><label>标题</label><input id="f-title" placeholder="例如：练车"></div>
+    <div class="field"><label>标签与颜色</label><div style="display:flex;gap:8px;"><input id="f-tag" style="flex:1;" value="自定义"><input id="f-tagcolor" type="color" value="#6b7280" style="width:50px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;"></div></div>
+    <div class="field"><label>时长(分)</label><input id="f-min" type="number" min="1" value="15"></div>
+    <div class="field"><label>从</label><input id="f-from" type="date" value="${start}"></div>
+    <div class="field"><label>到</label><input id="f-to" type="date" value="${state.meta.endDate}"></div>
+    <div class="field"><label>星期（不选＝每天）</label><div class="weekd" id="f-wd">${[1,2,3,4,5,6,0].map(w => `<button type="button" data-w="${w}">${WD_CN[w]}</button>`).join('')}</div></div>
+    <div class="field"><label>怎么做</label><textarea id="f-how"></textarea></div>
+    <div class="field"><label>完成标准</label><textarea id="f-std"></textarea></div>
+    <div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-add">生成任务</button></div>`);
   const wdSet = new Set();
   modalBody.querySelectorAll('#f-wd button').forEach(b => { b.onclick = () => { const w = parseInt(b.getAttribute('data-w'), 10); if (wdSet.has(w)) { wdSet.delete(w); b.classList.remove('on'); } else { wdSet.add(w); b.classList.add('on'); } }; });
   modalBody.querySelector('#f-add').onclick = () => {
@@ -665,15 +595,17 @@ function openAddRangeDialog() {
       if (!wdSet.size || wdSet.has(wdOf(cur))) { state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: 'custom', tag, tagColor, title, minutes, how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim() }); n++; }
       cur = addDays(cur, 1);
     }
-    saveState(); closeModal(); renderAll(); toast('已生成 ' + n + ' 条任务');
+    saveState(); closeModal(); renderAll(); toast('已生成 ' + n + ' 条');
   };
 }
+
 function openEditCycleDialog() {
-  openModal('<h3>修改周期起止</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">只影响日期范围和统计显示，不会删除任务。</p><div class="field"><label>开始日期</label><input id="f-start" type="date" value="' + state.meta.startDate + '"></div><div class="field"><label>结束日期</label><input id="f-end" type="date" value="' + state.meta.endDate + '"></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">保存</button></div>');
-  modalBody.querySelector('#f-ok').onclick = () => { const s = modalBody.querySelector('#f-start').value, e = modalBody.querySelector('#f-end').value; if (!s || !e || s > e) return toast('日期不合法'); state.meta.startDate = s; state.meta.endDate = e; saveState(); closeModal(); renderAll(); toast('周期已更新'); };
+  openModal('<h3>修改周期起止</h3><div class="field"><label>开始日期</label><input id="f-start" type="date" value="' + state.meta.startDate + '"></div><div class="field"><label>结束日期</label><input id="f-end" type="date" value="' + state.meta.endDate + '"></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">保存</button></div>');
+  modalBody.querySelector('#f-ok').onclick = () => { const s = modalBody.querySelector('#f-start').value, e = modalBody.querySelector('#f-end').value; if (!s || !e || s > e) return toast('日期不合法'); state.meta.startDate = s; state.meta.endDate = e; saveState(); closeModal(); renderAll(); toast('已更新'); };
 }
+
 function openRestartDialog() {
-  openModal('<h3>开始新一轮</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">会重置周期起止日期，并清空所有勾选状态；任务内容保留。</p><div class="field"><label>新一轮开始日期</label><input id="f-start" type="date" value="' + todayStr() + '"></div><div class="field"><label>新一轮结束日期</label><input id="f-end" type="date" value="' + addDays(todayStr(), 30) + '"></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">开始</button></div>');
+  openModal('<h3>开始新一轮</h3><div class="field"><label>开始日期</label><input id="f-start" type="date" value="' + todayStr() + '"></div><div class="field"><label>结束日期</label><input id="f-end" type="date" value="' + addDays(todayStr(), 30) + '"></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-ok">开始</button></div>');
   modalBody.querySelector('#f-ok').onclick = () => {
     const s = modalBody.querySelector('#f-start').value, e = modalBody.querySelector('#f-end').value; if (!s || !e || s > e) return toast('日期不合法');
     state.meta.startDate = s; state.meta.endDate = e; state.checks = {};
@@ -682,12 +614,14 @@ function openRestartDialog() {
     saveState(); closeModal(); renderAll(); toast('新一轮已开始');
   };
 }
+
 function openResetDialog() {
-  openModal('<h3>重置为初始计划</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">会删除所有编辑和勾选，恢复成最初的 31 天计划。建议先导出备份。</p><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn danger" id="f-ok">确认重置</button></div>');
+  openModal('<h3>重置计划</h3><p class="muted">会删除所有编辑和勾选，恢复成最初的计划。建议先导出备份。</p><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn danger" id="f-ok">确认重置</button></div>');
   modalBody.querySelector('#f-ok').onclick = () => { state = buildSeedState(); saveState(); closeModal(); renderAll(); toast('已重置'); };
 }
+
 function openBulkImportDialog() {
-  openModal('<h3>批量导入</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">格式：2026-10-19 | 学习 | 背单词 | 30 | 不背单词 | 完成打卡<br>（缺少的项可以留空，用竖线隔开即可）</p><div class="field"><textarea id="f-bulk" style="height:150px;" placeholder="在这里粘贴 AI 输出的内容..."></textarea></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-do-import">解析并添加</button></div>');
+  openModal('<h3>批量导入</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">格式：日期 | 标签 | 标题 | 时长 | 怎么做 | 完成标准</p><div class="field"><textarea id="f-bulk" style="height:150px;" placeholder="粘贴 AI 输出..."></textarea></div><div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-do-import">解析</button></div>');
   modalBody.querySelector('#f-do-import').onclick = () => {
     const text = modalBody.querySelector('#f-bulk').value.trim(); if (!text) return;
     const lines = text.split('\n'); let count = 0; const gid = uid('g');
@@ -695,20 +629,19 @@ function openBulkImportDialog() {
       const parts = line.split('|').map(s => s.trim());
       if (parts.length >= 3) { state.tasks.push({ id: uid('t'), groupId: gid, date: parts[0] || todayStr(), tag: parts[1] || '自定义', tagColor: CAT_COLOR.custom, title: parts[2] || '未命名', minutes: parseInt(parts[3], 10) || 20, how: parts[4] || '', std: parts[5] || '' }); count++; }
     });
-    saveState(); closeModal(); renderAll(); toast('成功导入 ' + count + ' 条任务');
+    saveState(); closeModal(); renderAll(); toast('成功导入 ' + count + ' 条');
   };
 }
 
-/* ========== 导入 / 导出 ========== */
 function exportJSON() {
-  const data = { app: 'growth-plan', version: 4, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
+  const data = { app: 'growth-plan', version: 5, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = 'growth-plan-backup-' + todayStr() + '.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); toast('已导出');
 }
 function openImportDialog() {
-  openModal('<h3>导入 JSON</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">会覆盖当前任务和勾选。请选择之前导出的 .json 文件。</p><div class="field"><input type="file" id="f-file" accept="application/json,.json"></div><div class="actions"><button class="btn" data-close="1">取消</button></div>');
+  openModal('<h3>导入 JSON</h3><p class="muted">会覆盖当前数据。</p><div class="field"><input type="file" id="f-file" accept="application/json,.json"></div><div class="actions"><button class="btn" data-close="1">取消</button></div>');
   modalBody.querySelector('#f-file').onchange = e => {
     const f = e.target.files[0]; if (!f) return;
     const reader = new FileReader();
@@ -716,15 +649,14 @@ function openImportDialog() {
       try {
         const obj = JSON.parse(reader.result);
         if (!obj || !Array.isArray(obj.tasks)) throw new Error('bad');
-        state = { version: 4, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
+        state = { version: 5, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
         saveState(); closeModal(); renderAll(); toast('已导入');
-      } catch(err) { toast('文件格式不正确'); }
+      } catch(err) { toast('格式错误'); }
     };
     reader.readAsText(f);
   };
 }
 
-/* ========== 视图切换 & 工具 ========== */
 function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('#tabbar button').forEach(b => b.classList.remove('active'));
@@ -741,12 +673,10 @@ let toastTimer = null;
 function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('on'), 1600); }
 function renderAll() { renderToday(); renderCycle(); renderMe(); }
 
-// 一键回顶
 const topBtn = document.getElementById('back-to-top');
 document.querySelectorAll('.view').forEach(v => v.addEventListener('scroll', () => topBtn.classList.toggle('show', v.scrollTop > 300)));
 topBtn.onclick = () => document.querySelector('.view.active').scrollTo({ top: 0, behavior: 'smooth' });
 
-/* ========== 启动 ========== */
 loadState();
 const savedBg = localStorage.getItem('custom-bg');
 if (savedBg) document.documentElement.style.setProperty('--bg', savedBg);
