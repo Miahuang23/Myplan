@@ -10,14 +10,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{
-  --bg:#f5f7fb;--ink:#141a24;--sub:#5d6878;--line:#e4e8f0;--card:#fff;
+  --bg:#f5f7fb;--ink:#141a24;--sub:#5d6878;--line:#e4e8f0;--card:rgba(255,255,255,0.94);
   --brand:#4b5cf0;--brand2:#8b5cf6;--ok:#0f9d76;--warn:#c2410c;
   --radius:14px;--shadow:0 1px 2px rgba(20,26,36,.05),0 10px 24px -14px rgba(20,26,36,.22);
   --sb: env(safe-area-inset-bottom, 0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
-body{font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;font-size:15px;line-height:1.6;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
+body{
+  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;font-size:15px;line-height:1.6;color:var(--ink);
+  background-color:var(--bg);
+  background-size:cover;background-position:center;background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;transition:background 0.3s;
+}
+body.has-bg::before{content:"";position:fixed;inset:0;background:rgba(245,247,251,0.85);z-index:-1;}
 #app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:60px}
 .view{padding:16px 14px calc(16px + var(--sb));display:none}
 .view.active{display:block}
@@ -32,9 +38,9 @@ body{font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-syst
 h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
 h3{font-size:14.5px;margin:0 0 8px}
 .muted{color:var(--sub);font-size:13px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(10px);}
 .pad{padding:14px}
-.bar{height:8px;border-radius:999px;background:#e9edf6;overflow:hidden;margin:8px 0}
+.bar{height:8px;border-radius:999px;background:rgba(233,237,246,0.8);overflow:hidden;margin:8px 0}
 .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;transition:width .35s}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:13.5px;font-family:inherit;cursor:pointer;}
 .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -48,28 +54,41 @@ h3{font-size:14.5px;margin:0 0 8px}
 .today-date{font-size:26px;font-weight:700;letter-spacing:-.02em}
 .today-week{color:var(--sub);font-size:13px}
 .today-stat{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--sub)}
+.pill{background:rgba(255,255,255,0.8);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--sub)}
 .pill b{color:var(--ink)}
 
 /* 任务卡 */
-.task{display:flex;gap:10px;align-items:flex-start;padding:12px 12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);}
-.task.done{opacity:.62}
+.task{display:flex;gap:10px;align-items:flex-start;padding:12px 12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);transition:all 0.2s;}
+.task.done{opacity:.6;background:rgba(255,255,255,0.5);}
+.task.pinned{border-color:rgba(75,92,240,0.3);box-shadow:0 0 0 1px rgba(75,92,240,0.1),var(--shadow);}
 .task .cb{flex:none;width:22px;height:22px;border:1.6px solid #c3cddd;border-radius:7px;background:#fff;margin-top:1px;position:relative;cursor:pointer;}
 .task.done .cb{background:var(--ok);border-color:var(--ok)}
 .task.done .cb::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:12px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
-.task .body{min-width:0;flex:1;cursor:pointer;} /* 点击正文查看详情 */
+.task .body{min-width:0;flex:1;cursor:pointer;}
 .task .t1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .task .title{font-weight:600;font-size:14.5px}
 .task.done .title{text-decoration:line-through;color:#9aa5b5}
-.task .min{font-size:11.5px;color:#7c8797;background:#f2f5fa;border-radius:6px;padding:1px 6px}
+.task .min{font-size:11.5px;color:#7c8797;background:rgba(242,245,250,0.8);border-radius:6px;padding:1px 6px}
 .task .tag-box{display:inline-block;font-size:11.5px;padding:1px 6px;border-radius:6px;color:#fff;margin-right:4px;}
 .task .how{font-size:12.8px;color:var(--sub);margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .task .more{border:0;background:none;color:#93a0b4;font-size:20px;padding:0 4px;cursor:pointer;line-height:1;}
 .empty{padding:24px;text-align:center;color:var(--sub);font-size:13px;}
 
+/* 热力图 */
+.heatmap{display:grid;grid-template-columns:repeat(7, 1fr);gap:4px;margin-top:10px;}
+.hm-cell{aspect-ratio:1;border-radius:4px;background:rgba(0,0,0,0.05);position:relative;}
+.hm-cell.lv1{background:rgba(75,92,240,0.2)}
+.hm-cell.lv2{background:rgba(75,92,240,0.4)}
+.hm-cell.lv3{background:rgba(75,92,240,0.6)}
+.hm-cell.lv4{background:rgba(75,92,240,0.85)}
+.hm-cell.lv5{background:rgba(75,92,240,1)}
+.hm-cell.empty{background:transparent}
+.hm-legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:var(--sub);margin-top:8px;}
+.hm-legend span{width:12px;height:12px;border-radius:3px;}
+
 /* 周期 */
 .daygrp{margin-top:14px}
-.dayhead{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:8px;padding:8px 2px 6px;font-weight:650;}
+.dayhead{position:sticky;top:0;z-index:5;background:rgba(245,247,251,0.9);backdrop-filter:blur(4px);display:flex;align-items:baseline;gap:8px;padding:8px 2px 6px;font-weight:650;}
 .dayhead .dt{font-size:14.5px}.dayhead .wd{font-size:12px;color:var(--sub);font-weight:400}
 .dayhead .cnt{margin-left:auto;font-size:12px;color:var(--sub);font-weight:400}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin:2px -2px 0;scrollbar-width:none}
@@ -84,7 +103,7 @@ h3{font-size:14.5px;margin:0 0 8px}
 
 /* 我的 */
 .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;backdrop-filter:blur(10px);}
 .stat .k{font-size:12px;color:var(--sub)}.stat .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
 .list{list-style:none;padding:0;margin:8px 0 0}
 .list li{padding:10px 0;border-bottom:1px solid #f1f4f9;display:flex;align-items:center;gap:8px;font-size:13.5px}
@@ -94,7 +113,7 @@ h3{font-size:14.5px;margin:0 0 8px}
 .ph .nm{flex:1}.ph .pg{width:100px;height:6px;border-radius:999px;background:#e9edf6;overflow:hidden}.ph .pg i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
 .ph .v{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
 .searchbox{display:flex;gap:8px;margin-top:8px}
-.searchbox input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);font-size:14px;font-family:inherit;background:#fff;color:var(--ink);}
+.searchbox input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--line);font-size:14px;font-family:inherit;background:rgba(255,255,255,0.8);color:var(--ink);}
 .results li{cursor:pointer}.results li:hover{background:#fafbfe}
 
 /* Modal & Form */
@@ -119,6 +138,7 @@ h3{font-size:14.5px;margin:0 0 8px}
 .detail-label{font-size:12px;color:var(--sub);margin-bottom:2px;}
 .detail-val{font-weight:500;}
 .detail-box{background:#f8fafc;padding:10px;border-radius:8px;font-size:13.5px;color:#334155;margin-top:2px;white-space:pre-wrap;}
+.btn-timer{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border:none;padding:10px;border-radius:10px;width:100%;font-size:15px;font-weight:bold;margin-top:10px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;}
 
 /* 工具 */
 #back-to-top{position:fixed;right:16px;bottom:80px;width:44px;height:44px;border-radius:50%;background:var(--brand);color:#fff;font-size:20px;border:none;box-shadow:0 4px 12px rgba(75,92,240,.3);display:none;align-items:center;justify-content:center;z-index:90;}
@@ -144,7 +164,7 @@ h3{font-size:14.5px;margin:0 0 8px}
 <div id="toast"></div>
 
 <script>
-const STORE_KEY = 'growth-plan:2026-10:v5';
+const STORE_KEY = 'growth-plan:2026-10:v6';
 const DEFAULT_META = { appTitle:'四周成长周期计划', startDate:'2026-10-16', endDate:'2026-11-15', phaseStart:'2026-10-19' };
 const PHASES = [
   { name:'准备期', start:'2026-10-16', end:'2026-10-18' }, { name:'第 1 周期', start:'2026-10-19', end:'2026-10-25' },
@@ -342,10 +362,10 @@ const SEED_ROWS = [
 let state = null;
 function uid(p){ return (p||'t')+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
 function buildSeedState() {
-  const tasks = SEED_ROWS.map((row, i) => ({ id:'seed-'+i, date:row[0], category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null }));
+  const tasks = SEED_ROWS.map((row, i) => ({ id:'seed-'+i, date:row[0], category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null, pinned:false }));
   const map = {};
   tasks.forEach(t => { const k = t.category + '||' + t.title; if (!map[k]) map[k] = 'g-' + Math.random().toString(36).slice(2, 9); t.groupId = map[k]; });
-  return { version: 5, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
+  return { version: 6, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
 }
 function loadState() {
   try {
@@ -355,7 +375,7 @@ function loadState() {
     if (!s || !s.tasks) throw new Error('bad');
     if (!s.meta) s.meta = Object.assign({}, DEFAULT_META);
     if (!s.checks) s.checks = {};
-    s.version = 5; state = s;
+    s.version = 6; state = s;
   } catch(e) { state = buildSeedState(); saveState(); }
 }
 function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {} }
@@ -370,7 +390,15 @@ function addDays(s,n){ const d=parseD(s); d.setDate(d.getDate()+n); return d.get
 function cmpDate(a,b){ return a<b?-1:a>b?1:0; }
 function daysBetween(a,b){ return Math.round((parseD(b)-parseD(a))/86400000); }
 
-function tasksOn(date) { return state.tasks.filter(t => t.date === date).sort((a,b) => (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh')); }
+function tasksOn(date) {
+  let ts = state.tasks.filter(t => t.date === date);
+  // 排序：置顶优先 -> 未完成优先 -> 护肤排最后 -> 标题拼音
+  return ts.sort((a,b) => {
+    if (a.pinned && !b.pinned) return -1; if (!a.pinned && b.pinned) return 1;
+    if (isChecked(a) !== isChecked(b)) return isChecked(a) ? 1 : -1;
+    return (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh');
+  });
+}
 function allDates() { const set = {}; state.tasks.forEach(t => set[t.date] = 1); return Object.keys(set).sort(); }
 function isChecked(t) { return !!state.checks[t.id]; }
 function toggleCheck(t) { if (state.checks[t.id]) delete state.checks[t.id]; else state.checks[t.id] = 1; saveState(); }
@@ -396,9 +424,42 @@ function renderToday() {
   if (today < m.startDate) { el.innerHTML = '<h1>周期还没开始</h1><div class="card pad"><button class="btn primary" id="btn-shift">改开始日期到今天</button></div>'; el.querySelector('#btn-shift').onclick = () => { state.meta.startDate = today; saveState(); renderAll(); }; return; }
   const ts = tasksOn(today); const p = progressOn(today);
   let html = '<div class="today-head"><span class="today-date">' + fmtCN(today) + '</span><span class="today-week">' + wdCN(today) + '</span></div><div class="today-stat"><span class="pill">今日 <b>' + p.done + '/' + p.total + '</b></span><span class="pill">连续打卡 <b>' + streakDays() + '</b> 天</span></div><div class="bar"><i style="width:' + p.pct + '%"></i></div>';
-  if (!ts.length) html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
-  else { html += '<div id="today-tasks">'; ts.forEach(t => html += renderTaskHTML(t)); html += '</div><div style="margin-top:14px;text-align:center"><button class="btn" id="btn-add-today">+ 添加今日任务</button></div>'; }
-  el.innerHTML = html; el.querySelector('#btn-add-today').onclick = () => openTaskEditor(null, { date: today }); bindTaskEvents(el);
+
+  if (!ts.length) {
+    html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
+  } else {
+    const undone = ts.filter(t => !isChecked(t));
+    const done = ts.filter(t => isChecked(t));
+    
+    html += '<div id="today-tasks">';
+    undone.forEach(t => html += renderTaskHTML(t));
+    html += '</div>';
+    
+    if (done.length > 0) {
+      html += `<div style="margin-top:16px;display:flex;align-items:center;gap:10px;">
+                <div style="flex:1;height:1px;background:var(--line)"></div>
+                <div class="muted" style="font-size:12px;cursor:pointer;" id="toggle-done">已折叠 ${done.length} 项已完成任务 ▾</div>
+                <div style="flex:1;height:1px;background:var(--line)"></div>
+               </div>`;
+      html += `<div id="done-tasks" style="display:none;margin-top:8px;">`;
+      done.forEach(t => html += renderTaskHTML(t));
+      html += `</div>`;
+    }
+    html += '<div style="margin-top:20px;text-align:center"><button class="btn" id="btn-add-today">+ 添加今日任务</button></div>';
+  }
+  el.innerHTML = html;
+  
+  el.querySelector('#btn-add-today').onclick = () => openTaskEditor(null, { date: today });
+  const toggleBtn = el.querySelector('#toggle-done');
+  if (toggleBtn) {
+    toggleBtn.onclick = () => {
+      const container = el.querySelector('#done-tasks');
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.innerHTML = isHidden ? '收起已完成任务 ▴' : `已折叠 ${done.length} 项已完成任务 ▾`;
+    };
+  }
+  bindTaskEvents(el);
 }
 
 /* ========== 视图：周期 ========== */
@@ -444,16 +505,49 @@ function renderSeqGrid() {
 function renderMe() {
   const el = document.getElementById('view-me'); const o = overallProgress(), streak = streakDays(), wk = weekProgress(todayStr()), today = todayStr();
   let html = '<h1>我的</h1><div class="statgrid"><div class="stat"><div class="k">总进度</div><div class="v">' + o.pct + '%</div><div class="muted" style="font-size:12px">' + o.done + ' / ' + o.total + '</div></div><div class="stat"><div class="k">连续打卡</div><div class="v">' + streak + '<span style="font-size:13px;font-weight:400;color:var(--sub)"> 天</span></div></div><div class="stat"><div class="k">今日完成</div><div class="v">' + progressOn(today).done + '<span style="font-size:13px;font-weight:400;color:var(--sub)">/' + progressOn(today).total + '</span></div></div><div class="stat"><div class="k">本周完成率</div><div class="v">' + wk.pct + '%</div></div></div>';
+  
+  // 热力图
+  html += '<div class="card pad" style="margin-top:12px"><h3>周期打卡热力图</h3>' + renderHeatmap() + '</div>';
+
   html += '<div class="card pad" style="margin-top:12px"><h3>五个阶段</h3>' + renderPhaseListHTML() + '</div><div class="card pad" style="margin-top:12px"><h3>快捷操作</h3><div class="row"><button class="btn" id="btn-check-today">勾选今日全部</button><button class="btn" id="btn-uncheck-today">取消今日全部</button></div></div>';
   html += '<div class="card pad" style="margin-top:12px"><h3>搜索</h3><div class="searchbox"><input id="me-search" type="search" placeholder="输入关键词搜索"></div><ul class="list results" id="me-results"></ul></div>';
-  html += '<div class="card pad" style="margin-top:12px"><h3>页面背景颜色</h3><div class="row"><input type="color" id="bg-color-picker" style="width:50px;height:36px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer;" value="' + (localStorage.getItem('custom-bg') || '#f5f7fb') + '"><span class="muted" style="font-size:12px">点击色块立即生效</span></div></div>';
+  
+  // 背景图
+  html += `<div class="card pad" style="margin-top:12px"><h3>自定义背景</h3><p class="muted" style="font-size:12px;margin-bottom:8px;">上传一张图片作为整个 App 的背景（自动加半透明遮罩保证清晰度）。</p><div class="row"><input type="file" id="bg-file" accept="image/*" style="display:none;"><button class="btn sm" id="btn-upload-bg">上传图片</button><button class="btn sm danger" id="btn-clear-bg">清除背景</button></div></div>`;
+
   html += '<div class="card pad" style="margin-top:12px"><h3>批量导入计划</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">格式：日期 | 标签 | 标题 | 时长 | 怎么做 | 完成标准</p><button class="btn primary" id="btn-bulk-import">粘贴文本生成任务</button></div>';
   html += '<div class="card pad" style="margin-top:12px"><h3>数据管理</h3><div class="row"><button class="btn primary" id="btn-export">导出 JSON</button><button class="btn" id="btn-import">导入 JSON</button><button class="btn danger" id="btn-reset">重置为初始计划</button></div></div>';
   el.innerHTML = html;
+
   el.querySelector('#btn-check-today').onclick = () => { tasksOn(today).forEach(t => { if (!isChecked(t)) toggleCheck(t); }); renderAll(); toast('已勾选今日全部'); };
   el.querySelector('#btn-uncheck-today').onclick = () => { tasksOn(today).forEach(t => { if (isChecked(t)) toggleCheck(t); }); renderAll(); toast('已取消今日全部'); };
   el.querySelector('#btn-export').onclick = exportJSON; el.querySelector('#btn-import').onclick = openImportDialog; el.querySelector('#btn-reset').onclick = openResetDialog; el.querySelector('#btn-bulk-import').onclick = openBulkImportDialog;
-  el.querySelector('#bg-color-picker').addEventListener('input', e => { document.documentElement.style.setProperty('--bg', e.target.value); localStorage.setItem('custom-bg', e.target.value); });
+  
+  const bgFile = el.querySelector('#bg-file');
+  el.querySelector('#btn-upload-bg').onclick = () => bgFile.click();
+  el.querySelector('#btn-clear-bg').onclick = () => { localStorage.removeItem('custom-bg-img'); applyBackground(); toast('已清除背景'); };
+  bgFile.onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const MAX = 1080;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = h * MAX / w; w = MAX; }
+        canvas.width = w; canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+        const b64 = canvas.toDataURL('image/jpeg', 0.75);
+        localStorage.setItem('custom-bg-img', b64);
+        applyBackground(); toast('背景已更新');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(f);
+  };
+
   el.querySelector('#me-search').addEventListener('input', e => {
     const q = e.target.value.trim(); const list = document.getElementById('me-results');
     if (!q) { list.innerHTML = ''; return; }
@@ -464,16 +558,52 @@ function renderMe() {
 }
 function renderPhaseListHTML() { return PHASES.map(p => { const pr = phaseProgress(p); return '<div class="ph"><span class="nm">' + p.name + '</span><span class="pg"><i style="width:' + pr.pct + '%"></i></span><span class="v">' + pr.done + '/' + pr.total + '</span></div>'; }).join(''); }
 
-/* ========== 任务渲染与绑定 ========== */
+function renderHeatmap() {
+  const m = state.meta;
+  let start = m.startDate;
+  let end = m.endDate;
+  // 补齐到整周
+  start = addDays(start, -(wdOf(start)===0 ? 6 : wdOf(start)-1));
+  end = addDays(end, 7-wdOf(end));
+  
+  let cells = '';
+  let cur = start;
+  let hasData = false;
+  while (cur <= end) {
+    if (cur >= m.startDate && cur <= m.endDate) {
+      hasData = true;
+      const p = progressOn(cur);
+      let lv = '';
+      if (p.total > 0) {
+        if (p.pct === 0) lv = '';
+        else if (p.pct < 30) lv = 'lv1';
+        else if (p.pct < 60) lv = 'lv2';
+        else if (p.pct < 90) lv = 'lv3';
+        else if (p.pct < 100) lv = 'lv4';
+        else lv = 'lv5';
+      }
+      cells += `<div class="hm-cell ${lv}" title="${cur} (${p.done}/${p.total})"></div>`;
+    } else {
+      cells += `<div class="hm-cell empty"></div>`;
+    }
+    cur = addDays(cur, 1);
+  }
+  if(!hasData) return '';
+  return `<div class="heatmap">${cells}</div>
+          <div class="hm-legend">少 <span style="background:rgba(0,0,0,0.05)"></span><span style="background:rgba(75,92,240,0.2)"></span><span style="background:rgba(75,92,240,0.4)"></span><span style="background:rgba(75,92,240,0.85)"></span> 多</div>`;
+}
+
+/* ========== 任务渲染 ========== */
 function renderTaskHTML(t) {
   const done = isChecked(t);
   const cat = t.tagColor || '#6b7280';
   const tagName = t.tag || '自定义';
   let timeStr = t.startTime && t.endTime ? `<span class="min" style="background:rgba(75,92,240,.1);color:var(--brand);">${t.startTime}-${t.endTime}</span>` : `<span class="min">${t.minutes}min</span>`;
-  return `<div class="task${done?' done':''}" data-id="${t.id}">
+  return `<div class="task${done?' done':''}${t.pinned?' pinned':''}" data-id="${t.id}">
     <span class="cb" data-act="toggle"></span>
     <div class="body" data-act="detail">
       <div class="t1">
+        ${t.pinned ? '<span style="font-size:12px;">📌</span>' : ''}
         <span class="tag-box" style="background:${cat}">${escapeHTML(tagName)}</span>
         <span class="title">${escapeHTML(t.title)}</span>
         ${timeStr}
@@ -516,18 +646,74 @@ function openTaskDetail(t) {
     ${timeInfo}
     <div class="detail-row"><div class="detail-label">详细步骤</div><div class="detail-box">${escapeHTML(t.how || '未填写')}</div></div>
     <div class="detail-row"><div class="detail-label">完成标准</div><div class="detail-box" style="background:rgba(15,157,118,.07);color:#0b6b51;">${escapeHTML(t.std || '未填写')}</div></div>
-    <div class="actions"><button class="btn primary" data-close="1">关闭</button></div>
+    <button class="btn-timer" id="btn-start-focus">▶ 开始专注 (${t.minutes} 分钟)</button>
+    <div class="actions"><button class="btn" data-close="1">关闭</button></div>
   `);
+  
+  modalBody.querySelector('#btn-start-focus').onclick = () => openPomodoro(t);
+}
+
+function openPomodoro(t) {
+  let sec = t.minutes * 60;
+  let timer = null;
+  const format = (s) => `${pad2(Math.floor(s/60))}:${pad2(s%60)}`;
+  
+  openModal(`<div style="text-align:center;padding:20px 0;">
+    <h2 style="font-size:18px;color:var(--sub);margin-bottom:10px;">${escapeHTML(t.title)}</h2>
+    <div id="pomo-time" style="font-size:64px;font-weight:bold;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1;margin:20px 0;">${format(sec)}</div>
+    <div class="row" style="justify-content:center;margin-top:20px;">
+      <button class="btn danger" id="pomo-cancel">放弃</button>
+      <button class="btn primary" id="pomo-toggle">暂停</button>
+    </div>
+  </div>`);
+  
+  const timeEl = document.getElementById('pomo-time');
+  const btnToggle = document.getElementById('pomo-toggle');
+  
+  timer = setInterval(() => {
+    sec--;
+    if (sec <= 0) {
+      clearInterval(timer);
+      timeEl.textContent = "00:00";
+      if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+      toast("⏰ 专注时间到！");
+      setTimeout(closeModal, 1000);
+    } else {
+      timeEl.textContent = format(sec);
+    }
+  }, 1000);
+  
+  btnToggle.onclick = () => {
+    if (timer) {
+      clearInterval(timer); timer = null; btnToggle.textContent = '继续';
+    } else {
+      timer = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+          clearInterval(timer); timeEl.textContent = "00:00";
+          if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+          toast("⏰ 专注时间到！");
+          setTimeout(closeModal, 1000);
+        } else {
+          timeEl.textContent = format(sec);
+        }
+      }, 1000);
+      btnToggle.textContent = '暂停';
+    }
+  };
+  
+  document.getElementById('pomo-cancel').onclick = () => { clearInterval(timer); closeModal(); };
 }
 
 function openTaskMenu(t) {
-  let html = '<h3>' + escapeHTML(t.title) + '</h3><div class="row"><button class="btn primary" data-a="edit">编辑</button><button class="btn" data-a="date">改日期</button><button class="btn danger" data-a="del">删除</button>';
+  let html = '<h3>' + escapeHTML(t.title) + '</h3><div class="row"><button class="btn primary" data-a="edit">编辑</button><button class="btn" data-a="pin">' + (t.pinned ? '取消置顶' : '置顶') + '</button><button class="btn" data-a="date">改日期</button><button class="btn danger" data-a="del">删除</button>';
   if (t.groupId) { const n = state.tasks.filter(x => x.groupId === t.groupId).length; if (n > 1) html += '<button class="btn danger" data-a="delgroup">删整组(' + n + '条)</button>'; }
   html += '</div>'; openModal(html);
   modalBody.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.getAttribute('data-a');
       if (a === 'edit') { closeModal(); openTaskEditor(t.id, null); }
+      else if (a === 'pin') { t.pinned = !t.pinned; saveState(); closeModal(); renderAll(); toast(t.pinned?'已置顶':'已取消置顶'); }
       else if (a === 'date') { closeModal(); openChangeDateDialog(t); }
       else if (a === 'del') { state.tasks = state.tasks.filter(x => x.id !== t.id); saveState(); closeModal(); renderAll(); toast('已删除'); }
       else if (a === 'delgroup') { const gid = t.groupId; state.tasks = state.tasks.filter(x => x.groupId !== gid); saveState(); closeModal(); renderAll(); toast('已删除整组'); }
@@ -564,7 +750,7 @@ function openTaskEditor(id, defaults) {
       how: modalBody.querySelector('#f-how').value.trim(),
       std: modalBody.querySelector('#f-std').value.trim()
     };
-    if (t) Object.assign(t, data); else state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g'), category:'custom' }, data));
+    if (t) Object.assign(t, data); else state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g'), category:'custom', pinned: false }, data));
     saveState(); closeModal(); renderAll(); toast('已保存');
   };
 }
@@ -592,7 +778,7 @@ function openAddRangeDialog() {
     if (!from || !to || from > to) return toast('日期不合法');
     const gid = uid('g'); let cur = from, n = 0;
     while (cur <= to) {
-      if (!wdSet.size || wdSet.has(wdOf(cur))) { state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: 'custom', tag, tagColor, title, minutes, how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim() }); n++; }
+      if (!wdSet.size || wdSet.has(wdOf(cur))) { state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: 'custom', tag, tagColor, title, minutes, how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim(), pinned: false }); n++; }
       cur = addDays(cur, 1);
     }
     saveState(); closeModal(); renderAll(); toast('已生成 ' + n + ' 条');
@@ -627,14 +813,14 @@ function openBulkImportDialog() {
     const lines = text.split('\n'); let count = 0; const gid = uid('g');
     lines.forEach(line => {
       const parts = line.split('|').map(s => s.trim());
-      if (parts.length >= 3) { state.tasks.push({ id: uid('t'), groupId: gid, date: parts[0] || todayStr(), tag: parts[1] || '自定义', tagColor: CAT_COLOR.custom, title: parts[2] || '未命名', minutes: parseInt(parts[3], 10) || 20, how: parts[4] || '', std: parts[5] || '' }); count++; }
+      if (parts.length >= 3) { state.tasks.push({ id: uid('t'), groupId: gid, date: parts[0] || todayStr(), tag: parts[1] || '自定义', tagColor: CAT_COLOR.custom, title: parts[2] || '未命名', minutes: parseInt(parts[3], 10) || 20, how: parts[4] || '', std: parts[5] || '', pinned: false }); count++; }
     });
     saveState(); closeModal(); renderAll(); toast('成功导入 ' + count + ' 条');
   };
 }
 
 function exportJSON() {
-  const data = { app: 'growth-plan', version: 5, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
+  const data = { app: 'growth-plan', version: 6, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = 'growth-plan-backup-' + todayStr() + '.json';
@@ -649,7 +835,7 @@ function openImportDialog() {
       try {
         const obj = JSON.parse(reader.result);
         if (!obj || !Array.isArray(obj.tasks)) throw new Error('bad');
-        state = { version: 5, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
+        state = { version: 6, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
         saveState(); closeModal(); renderAll(); toast('已导入');
       } catch(err) { toast('格式错误'); }
     };
@@ -677,9 +863,19 @@ const topBtn = document.getElementById('back-to-top');
 document.querySelectorAll('.view').forEach(v => v.addEventListener('scroll', () => topBtn.classList.toggle('show', v.scrollTop > 300)));
 topBtn.onclick = () => document.querySelector('.view.active').scrollTo({ top: 0, behavior: 'smooth' });
 
+function applyBackground() {
+  const savedBg = localStorage.getItem('custom-bg-img');
+  if (savedBg) {
+    document.body.style.backgroundImage = `url(${savedBg})`;
+    document.body.classList.add('has-bg');
+  } else {
+    document.body.style.backgroundImage = '';
+    document.body.classList.remove('has-bg');
+  }
+}
+
 loadState();
-const savedBg = localStorage.getItem('custom-bg');
-if (savedBg) document.documentElement.style.setProperty('--bg', savedBg);
+applyBackground();
 renderAll();
 </script>
 </body>
