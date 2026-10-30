@@ -79,11 +79,13 @@ h3{font-size:14.5px;margin:0 0 8px}
 .task .more{border:0;background:none;color:#93a0b4;font-size:20px;padding:0 4px;cursor:pointer;line-height:1;}
 .empty{padding:24px;text-align:center;color:var(--sub);font-size:13px;}
 
-/* 热力图 */
-.heatmap-wrap { width: 100%; overflow: hidden; margin-top: 10px; }
-.hm-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 11px; color: var(--sub); margin-bottom: 6px; }
-.heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.hm-cell { width: 100%; padding-top: 100%; position: relative; border-radius: 4px; background: rgba(0,0,0,0.05); }
+/* 热力图（彻底修复挤压错位问题） */
+.heatmap-wrap { width: 100%; margin-top: 10px; }
+.hm-header { display: flex; gap: 6px; text-align: center; font-size: 11px; color: var(--sub); margin-bottom: 6px; }
+.hm-header span { flex: 1; }
+.heatmap { display: flex; flex-direction: column; gap: 6px; }
+.hm-row { display: flex; gap: 6px; }
+.hm-cell { flex: 1; aspect-ratio: 1 / 1; border-radius: 4px; background: rgba(0,0,0,0.05); }
 .hm-cell.lv1{background:rgba(75,92,240,0.2)}
 .hm-cell.lv2{background:rgba(75,92,240,0.4)}
 .hm-cell.lv3{background:rgba(75,92,240,0.6)}
@@ -642,34 +644,45 @@ function renderHeatmap() {
   start = addDays(start, -(wdOf(start)===0 ? 6 : wdOf(start)-1));
   end = addDays(end, 7-wdOf(end));
   
-  let cells = '';
+  let html = '<div class="heatmap-wrap">';
+  // 表头
+  html += '<div class="hm-header"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>';
+  
+  html += '<div class="heatmap">';
+  
   let cur = start;
   let hasData = false;
+  
   while (cur <= end) {
-    if (cur >= m.startDate && cur <= m.endDate) {
-      hasData = true;
-      const p = progressOn(cur);
-      let lv = '';
-      if (p.total > 0) {
-        if (p.pct === 0) lv = '';
-        else if (p.pct < 30) lv = 'lv1';
-        else if (p.pct < 60) lv = 'lv2';
-        else if (p.pct < 90) lv = 'lv3';
-        else if (p.pct < 100) lv = 'lv4';
-        else lv = 'lv5';
+    html += '<div class="hm-row">';
+    for (let i = 0; i < 7; i++) {
+      if (cur >= m.startDate && cur <= m.endDate) {
+        hasData = true;
+        const p = progressOn(cur);
+        let lv = '';
+        if (p.total > 0) {
+          if (p.pct === 0) lv = '';
+          else if (p.pct < 30) lv = 'lv1';
+          else if (p.pct < 60) lv = 'lv2';
+          else if (p.pct < 90) lv = 'lv3';
+          else if (p.pct < 100) lv = 'lv4';
+          else lv = 'lv5';
+        }
+        html += `<div class="hm-cell ${lv}" title="${cur} (${p.done}/${p.total})"></div>`;
+      } else {
+        html += `<div class="hm-cell empty"></div>`;
       }
-      cells += `<div class="hm-cell ${lv}" title="${cur} (${p.done}/${p.total})"></div>`;
-    } else {
-      cells += `<div class="hm-cell empty"></div>`;
+      cur = addDays(cur, 1);
     }
-    cur = addDays(cur, 1);
+    html += '</div>';
   }
+  html += '</div>';
+  
+  html += '<div class="hm-legend">少 <span style="background:rgba(0,0,0,0.05)"></span><span style="background:rgba(75,92,240,0.2)"></span><span style="background:rgba(75,92,240,0.4)"></span><span style="background:rgba(75,92,240,0.85)"></span> 多</div>';
+  html += '</div>';
+  
   if(!hasData) return '';
-  return `<div class="heatmap-wrap">
-            <div class="hm-header"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
-            <div class="heatmap">${cells}</div>
-            <div class="hm-legend">少 <span style="background:rgba(0,0,0,0.05)"></span><span style="background:rgba(75,92,240,0.2)"></span><span style="background:rgba(75,92,240,0.4)"></span><span style="background:rgba(75,92,240,0.85)"></span> 多</div>
-          </div>`;
+  return html;
 }
 
 /* ========== 任务渲染 ========== */
@@ -714,12 +727,13 @@ function bindTaskEvents(root) {
       pressTimer = setTimeout(() => {
         if (navigator.vibrate) navigator.vibrate(50);
         openTaskMenu(t);
+        pressTimer = null;
       }, 500);
     };
     const cancelPress = () => { if(pressTimer) clearTimeout(pressTimer); };
     const doClick = (e) => {
       cancelPress();
-      if (pressTimer === null) return; // 如果已经长按触发过了，就不触发点击
+      if (pressTimer === null) return; // 如果长按已触发，不触发点击
       if (e.target.closest('[data-act="toggle"]') || e.target.closest('[data-act="more"]')) return;
       openTaskDetail(t);
     };
