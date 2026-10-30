@@ -11,9 +11,9 @@
 <style>
 :root{
   --bg:#f5f7fb;--ink:#141a24;--sub:#5d6878;--line:rgba(228,232,240,0.6);
-  --card:rgba(255,255,255,0.65); /* 卡片改为半透明 */
+  --card:rgba(255,255,255,0.65); /* 卡片半透明 */
   --brand:#4b5cf0;--brand2:#8b5cf6;--ok:#0f9d76;--warn:#c2410c;
-  --radius:14px;--shadow:0 4px 16px -4px rgba(20,26,36,.1); /* 阴影变柔和 */
+  --radius:14px;--shadow:0 4px 16px -4px rgba(20,26,36,.1);
   --sb: env(safe-area-inset-bottom, 0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -52,6 +52,9 @@ h3{font-size:14.5px;margin:0 0 8px}
 .spacer{flex:1}
 
 /* 今日 */
+.cycle-progress{margin-bottom:12px;font-size:12px;color:var(--sub);display:flex;justify-content:space-between;}
+.cycle-progress-bar{height:4px;background:rgba(0,0,0,0.05);border-radius:999px;margin-top:4px;overflow:hidden;}
+.cycle-progress-bar i{display:block;height:100%;background:var(--brand);border-radius:999px;transition:width .3s;}
 .today-head{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
 .today-date{font-size:26px;font-weight:700;letter-spacing:-.02em}
 .today-week{color:var(--sub);font-size:13px}
@@ -60,13 +63,13 @@ h3{font-size:14.5px;margin:0 0 8px}
 .pill b{color:var(--ink)}
 
 /* 任务卡 */
-.task{display:flex;gap:10px;align-items:flex-start;padding:12px 12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:all 0.2s;}
+.task{display:flex;gap:10px;align-items:flex-start;padding:12px 12px;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:all 0.2s;user-select:none;}
 .task.done{opacity:.6;background:rgba(255,255,255,0.4);}
 .task.pinned{border-color:rgba(75,92,240,0.4);box-shadow:0 0 0 1px rgba(75,92,240,0.2),var(--shadow);}
 .task .cb{flex:none;width:22px;height:22px;border:1.6px solid #c3cddd;border-radius:7px;background:rgba(255,255,255,0.8);margin-top:1px;position:relative;cursor:pointer;}
 .task.done .cb{background:var(--ok);border-color:var(--ok)}
 .task.done .cb::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:12px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
-.task .body{min-width:0;flex:1;cursor:pointer;}
+.task .body{min-width:0;flex:1;}
 .task .t1{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
 .task .title{font-weight:600;font-size:14.5px}
 .task.done .title{text-decoration:line-through;color:#9aa5b5}
@@ -77,15 +80,17 @@ h3{font-size:14.5px;margin:0 0 8px}
 .empty{padding:24px;text-align:center;color:var(--sub);font-size:13px;}
 
 /* 热力图 */
-.heatmap{display:grid;grid-template-columns:repeat(7, 1fr);gap:4px;margin-top:10px;}
-.hm-cell{aspect-ratio:1;border-radius:4px;background:rgba(0,0,0,0.05);position:relative;}
+.heatmap-wrap { width: 100%; overflow: hidden; margin-top: 10px; }
+.hm-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 11px; color: var(--sub); margin-bottom: 6px; }
+.heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.hm-cell { width: 100%; padding-top: 100%; position: relative; border-radius: 4px; background: rgba(0,0,0,0.05); }
 .hm-cell.lv1{background:rgba(75,92,240,0.2)}
 .hm-cell.lv2{background:rgba(75,92,240,0.4)}
 .hm-cell.lv3{background:rgba(75,92,240,0.6)}
 .hm-cell.lv4{background:rgba(75,92,240,0.85)}
 .hm-cell.lv5{background:rgba(75,92,240,1)}
-.hm-cell.empty{background:transparent}
-.hm-legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:var(--sub);margin-top:8px;}
+.hm-cell.empty{background:transparent !important;}
+.hm-legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:var(--sub);margin-top:10px;}
 .hm-legend span{width:12px;height:12px;border-radius:3px;}
 
 /* 周期 */
@@ -135,11 +140,15 @@ h3{font-size:14.5px;margin:0 0 8px}
 .weekd button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 
-/* 详情页专用 */
+/* 详情页及子任务 */
 .detail-row{margin-bottom:12px;font-size:14px;line-height:1.6;}
 .detail-label{font-size:12px;color:var(--sub);margin-bottom:2px;}
 .detail-val{font-weight:500;}
 .detail-box{background:#f8fafc;padding:10px;border-radius:8px;font-size:13.5px;color:#334155;margin-top:2px;white-space:pre-wrap;}
+.subtask-list{list-style:none;padding:0;margin:8px 0;}
+.subtask-list li{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f4f9;font-size:13.5px;}
+.subtask-list li:last-child{border-bottom:0;}
+.subtask-list input[type="checkbox"]{width:18px;height:18px;accent-color:var(--brand);cursor:pointer;}
 .btn-timer{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border:none;padding:10px;border-radius:10px;width:100%;font-size:15px;font-weight:bold;margin-top:10px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;}
 
 /* 工具 */
@@ -166,7 +175,7 @@ h3{font-size:14.5px;margin:0 0 8px}
 <div id="toast"></div>
 
 <script>
-const STORE_KEY = 'growth-plan:2026-10:v7'; // 升级版本号，强制刷新数据
+const STORE_KEY = 'growth-plan:2026-10:v10';
 const DEFAULT_META = { appTitle:'四周成长周期计划', startDate:'2026-10-30', endDate:'2026-11-29', phaseStart:'2026-10-30' };
 const PHASES = [
   { name:'准备期', start:'2026-10-30', end:'2026-11-01' }, { name:'第 1 周期', start:'2026-11-02', end:'2026-11-08' },
@@ -364,10 +373,8 @@ const SEED_ROWS = [
 let state = null;
 function uid(p){ return (p||'t')+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
 function buildSeedState() {
-  // 核心修改点：将原来的数据整体平移，让 2026-10-30 变成第一天
   const tasks = SEED_ROWS.map((row, i) => {
     let newDate = row[0];
-    // 这里做一个简单的日期映射替换（原计划从10/16开始，新计划从10/30开始）
     if(newDate === '2026-10-16') newDate = '2026-10-30';
     else if(newDate === '2026-10-17') newDate = '2026-10-31';
     else if(newDate === '2026-10-18') newDate = '2026-11-01';
@@ -400,12 +407,12 @@ function buildSeedState() {
     else if(newDate === '2026-11-14') newDate = '2026-11-28';
     else if(newDate === '2026-11-15') newDate = '2026-11-29';
 
-    return { id:'seed-'+i, date:newDate, category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null, pinned:false };
+    return { id:'seed-'+i, date:newDate, category:row[1], title:row[2], minutes:row[3], how:row[4], std:row[5], tag:CAT_LABEL[row[1]], tagColor:CAT_COLOR[row[1]], groupId:null, pinned:false, sortOrder:i, subtasks:[] };
   });
   
   const map = {};
   tasks.forEach(t => { const k = t.category + '||' + t.title; if (!map[k]) map[k] = 'g-' + Math.random().toString(36).slice(2, 9); t.groupId = map[k]; });
-  return { version: 7, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
+  return { version: 10, meta: Object.assign({}, DEFAULT_META), tasks: tasks, checks: {} };
 }
 function loadState() {
   try {
@@ -415,7 +422,7 @@ function loadState() {
     if (!s || !s.tasks) throw new Error('bad');
     if (!s.meta) s.meta = Object.assign({}, DEFAULT_META);
     if (!s.checks) s.checks = {};
-    s.version = 7; state = s;
+    s.version = 10; state = s;
   } catch(e) { state = buildSeedState(); saveState(); }
 }
 function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {} }
@@ -430,12 +437,13 @@ function addDays(s,n){ const d=parseD(s); d.setDate(d.getDate()+n); return d.get
 function cmpDate(a,b){ return a<b?-1:a>b?1:0; }
 function daysBetween(a,b){ return Math.round((parseD(b)-parseD(a))/86400000); }
 
+// 排序逻辑优化：加入 sortOrder
 function tasksOn(date) {
   let ts = state.tasks.filter(t => t.date === date);
   return ts.sort((a,b) => {
     if (a.pinned && !b.pinned) return -1; if (!a.pinned && b.pinned) return 1;
     if (isChecked(a) !== isChecked(b)) return isChecked(a) ? 1 : -1;
-    return (a.category==='sk'?1:0)-(b.category==='sk'?1:0) || a.title.localeCompare(b.title,'zh');
+    return (a.sortOrder || 0) - (b.sortOrder || 0);
   });
 }
 function allDates() { const set = {}; state.tasks.forEach(t => set[t.date] = 1); return Object.keys(set).sort(); }
@@ -455,14 +463,26 @@ function streakDays() {
 }
 function weekRangeFor(dateStr) { const d = parseD(dateStr); const wd = d.getDay(); const start = addDays(dateStr, -(wd === 0 ? 6 : wd - 1)); return [start, addDays(start, 6)]; }
 function weekProgress(dateStr) { const r = weekRangeFor(dateStr); const ts = state.tasks.filter(t => t.date >= r[0] && t.date <= r[1]); const done = ts.filter(isChecked).length; return { from: r[0], to: r[1], total: ts.length, done: done, pct: ts.length ? Math.round(done/ts.length*100) : 0 }; }
+function getTags() { const tags = new Set(); state.tasks.forEach(t => { if (t.tag) tags.add(t.tag); }); return Array.from(tags); }
 
 /* ========== 视图：今日 ========== */
 function renderToday() {
   const el = document.getElementById('view-today'); const today = todayStr(); const m = state.meta;
   if (today > m.endDate) { el.innerHTML = '<h1>周期已结束</h1><div class="card pad"><button class="btn primary" id="btn-restart">开始新一轮</button></div>'; el.querySelector('#btn-restart').onclick = openRestartDialog; return; }
   if (today < m.startDate) { el.innerHTML = '<h1>周期还没开始</h1><div class="card pad"><button class="btn primary" id="btn-shift">改开始日期到今天</button></div>'; el.querySelector('#btn-shift').onclick = () => { state.meta.startDate = today; saveState(); renderAll(); }; return; }
+
+  // 周期进度计算
+  const totalDays = daysBetween(m.startDate, m.endDate) + 1;
+  const daysPassed = Math.max(0, daysBetween(m.startDate, today) + 1);
+  const cyclePct = Math.min(100, Math.round(daysPassed / totalDays * 100));
+
   const ts = tasksOn(today); const p = progressOn(today);
-  let html = '<div class="today-head"><span class="today-date">' + fmtCN(today) + '</span><span class="today-week">' + wdCN(today) + '</span></div><div class="today-stat"><span class="pill">今日 <b>' + p.done + '/' + p.total + '</b></span><span class="pill">连续打卡 <b>' + streakDays() + '</b> 天</span></div><div class="bar"><i style="width:' + p.pct + '%"></i></div>';
+  
+  let html = `<div class="cycle-progress"><span>本周期已过 <b>${daysPassed}</b> / ${totalDays} 天</span><span>还剩 ${totalDays - daysPassed} 天</span></div>
+              <div class="cycle-progress-bar"><i style="width:${cyclePct}%"></i></div>
+              <div class="today-head"><span class="today-date">${fmtCN(today)}</span><span class="today-week">${wdCN(today)}</span></div>
+              <div class="today-stat"><span class="pill">今日 <b>${p.done}/${p.total}</b></span><span class="pill">连续打卡 <b>${streakDays()}</b> 天</span></div>
+              <div class="bar"><i style="width:${p.pct}%"></i></div>`;
 
   if (!ts.length) {
     html += '<div class="empty card" style="margin-top:14px">今天还没有任务。<br><br><button class="btn primary" id="btn-add-today">+ 添加今日任务</button></div>';
@@ -502,12 +522,27 @@ function renderToday() {
 }
 
 /* ========== 视图：周期 ========== */
-let cycleFilter = 'all', cycleSearch = '';
+let cycleFilterPhase = 'all', cycleFilterTag = 'all', cycleSearch = '';
 function renderCycle() {
   const el = document.getElementById('view-cycle'); const m = state.meta;
-  let html = '<h1>周期</h1><p class="muted">' + m.startDate + ' – ' + m.endDate + ' · 共 ' + state.tasks.length + ' 项</p><div class="row" style="margin-top:8px"><button class="btn sm" id="btn-edit-cycle">修改周期起止</button><button class="btn sm primary" id="btn-add-range">+ 添加任务</button></div><div class="searchbox"><input id="cycle-search" type="search" placeholder="搜索标题…" value="' + escapeAttr(cycleSearch) + '"></div><div class="chips" style="margin-top:10px"><button class="chip' + (cycleFilter==='all'?' on':'') + '" data-f="all">全部</button>';
-  PHASES.forEach((p, i) => html += '<button class="chip' + (cycleFilter===String(i)?' on':'') + '" data-f="' + i + '">' + p.name + '</button>');
-  html += '</div><div class="seqbox card pad"><h3>阿达帕林核对（只读）</h3><div class="seqgrid">' + renderSeqGrid() + '</div></div>';
+  let html = '<h1>周期</h1><p class="muted">' + m.startDate + ' – ' + m.endDate + ' · 共 ' + state.tasks.length + ' 项</p><div class="row" style="margin-top:8px"><button class="btn sm" id="btn-edit-cycle">修改周期起止</button><button class="btn sm primary" id="btn-add-range">+ 添加任务</button></div><div class="searchbox"><input id="cycle-search" type="search" placeholder="搜索标题…" value="' + escapeAttr(cycleSearch) + '"></div>';
+  
+  // 阶段筛选
+  html += '<div class="chips" style="margin-top:10px"><button class="chip' + (cycleFilterPhase==='all'?' on':'') + '" data-f="all">全部阶段</button>';
+  PHASES.forEach((p, i) => html += '<button class="chip' + (cycleFilterPhase===String(i)?' on':'') + '" data-f="' + i + '">' + p.name + '</button>');
+  html += '</div>';
+
+  // 标签筛选
+  const tags = getTags();
+  if(tags.length > 0) {
+    html += '<div class="chips" style="margin-top:6px"><button class="chip' + (cycleFilterTag==='all'?' on':'') + '" data-t="all">全部标签</button>';
+    tags.forEach(tag => {
+      html += '<button class="chip' + (cycleFilterTag===tag?' on':'') + '" data-t="' + tag + '">' + tag + '</button>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="seqbox card pad"><h3>阿达帕林核对（只读）</h3><div class="seqgrid">' + renderSeqGrid() + '</div></div>';
   const dates = filteredDates();
   if (!dates.length) html += '<div class="empty">没有匹配的任务</div>';
   else dates.forEach(d => {
@@ -520,17 +555,20 @@ function renderCycle() {
   el.querySelector('#btn-edit-cycle').onclick = openEditCycleDialog;
   el.querySelector('#btn-add-range').onclick = openAddRangeDialog;
   el.querySelector('#cycle-search').addEventListener('input', e => { cycleSearch = e.target.value.trim(); renderCycle(); });
-  el.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { cycleFilter = b.getAttribute('data-f'); renderCycle(); });
+  
+  el.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { cycleFilterPhase = b.getAttribute('data-f'); renderCycle(); });
+  el.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { cycleFilterTag = b.getAttribute('data-t'); renderCycle(); });
   bindTaskEvents(el);
 }
 function taskMatchesFilter(t) {
-  if (cycleFilter !== 'all') { const p = PHASES[Number(cycleFilter)]; if (p && (t.date < p.start || t.date > p.end)) return false; }
+  if (cycleFilterPhase !== 'all') { const p = PHASES[Number(cycleFilterPhase)]; if (p && (t.date < p.start || t.date > p.end)) return false; }
+  if (cycleFilterTag !== 'all' && t.tag !== cycleFilterTag) return false;
   if (cycleSearch) { const q = cycleSearch.toLowerCase(); if (t.title.toLowerCase().indexOf(q) < 0 && (t.how||'').toLowerCase().indexOf(q) < 0) return false; }
   return true;
 }
 function filteredDates() {
   let ds = allDates();
-  if (cycleFilter !== 'all') { const p = PHASES[Number(cycleFilter)]; if (p) ds = ds.filter(d => d >= p.start && d <= p.end); }
+  if (cycleFilterPhase !== 'all') { const p = PHASES[Number(cycleFilterPhase)]; if (p) ds = ds.filter(d => d >= p.start && d <= p.end); }
   if (cycleSearch) ds = ds.filter(d => tasksOn(d).some(taskMatchesFilter));
   return ds;
 }
@@ -592,7 +630,7 @@ function renderMe() {
     if (!q) { list.innerHTML = ''; return; }
     const hits = state.tasks.filter(t => t.title.toLowerCase().indexOf(q.toLowerCase()) >= 0).slice(0, 30);
     list.innerHTML = hits.map(t => '<li data-id="' + t.id + '"><span class="cat" style="background:' + (t.tagColor||'#6b7280') + '"></span>' + escapeHTML(t.title) + '<span class="spacer"></span><span class="muted" style="font-size:12px">' + fmtCN(t.date) + '</span></li>').join('') || '<li class="muted" style="border:0">没有匹配</li>';
-    list.querySelectorAll('li[data-id]').forEach(li => { li.onclick = () => { const t = state.tasks.find(x => x.id === li.getAttribute('data-id')); if(t){ switchView('cycle'); cycleFilter = 'all'; cycleSearch = t.title; renderCycle(); } }; });
+    list.querySelectorAll('li[data-id]').forEach(li => { li.onclick = () => { const t = state.tasks.find(x => x.id === li.getAttribute('data-id')); if(t){ switchView('cycle'); cycleFilterPhase = 'all'; cycleFilterTag = 'all'; cycleSearch = t.title; renderCycle(); } }; });
   });
 }
 function renderPhaseListHTML() { return PHASES.map(p => { const pr = phaseProgress(p); return '<div class="ph"><span class="nm">' + p.name + '</span><span class="pg"><i style="width:' + pr.pct + '%"></i></span><span class="v">' + pr.done + '/' + pr.total + '</span></div>'; }).join(''); }
@@ -627,8 +665,11 @@ function renderHeatmap() {
     cur = addDays(cur, 1);
   }
   if(!hasData) return '';
-  return `<div class="heatmap">${cells}</div>
-          <div class="hm-legend">少 <span style="background:rgba(0,0,0,0.05)"></span><span style="background:rgba(75,92,240,0.2)"></span><span style="background:rgba(75,92,240,0.4)"></span><span style="background:rgba(75,92,240,0.85)"></span> 多</div>`;
+  return `<div class="heatmap-wrap">
+            <div class="hm-header"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div class="heatmap">${cells}</div>
+            <div class="hm-legend">少 <span style="background:rgba(0,0,0,0.05)"></span><span style="background:rgba(75,92,240,0.2)"></span><span style="background:rgba(75,92,240,0.4)"></span><span style="background:rgba(75,92,240,0.85)"></span> 多</div>
+          </div>`;
 }
 
 /* ========== 任务渲染 ========== */
@@ -637,26 +678,60 @@ function renderTaskHTML(t) {
   const cat = t.tagColor || '#6b7280';
   const tagName = t.tag || '自定义';
   let timeStr = t.startTime && t.endTime ? `<span class="min" style="background:rgba(75,92,240,.1);color:var(--brand);">${t.startTime}-${t.endTime}</span>` : `<span class="min">${t.minutes}min</span>`;
+  
+  let subInfo = '';
+  if (t.subtasks && t.subtasks.length > 0) {
+    const subDone = t.subtasks.filter(st => st.done).length;
+    subInfo = `<span style="font-size:11.5px;color:var(--brand);background:rgba(75,92,240,0.1);padding:1px 6px;border-radius:6px;margin-left:6px;">子任务 ${subDone}/${t.subtasks.length}</span>`;
+  }
+
   return `<div class="task${done?' done':''}${t.pinned?' pinned':''}" data-id="${t.id}">
     <span class="cb" data-act="toggle"></span>
-    <div class="body" data-act="detail">
+    <div class="body">
       <div class="t1">
         ${t.pinned ? '<span style="font-size:12px;">📌</span>' : ''}
         <span class="tag-box" style="background:${cat}">${escapeHTML(tagName)}</span>
         <span class="title">${escapeHTML(t.title)}</span>
-        ${timeStr}
+        ${timeStr}${subInfo}
       </div>
       <div class="how">${escapeHTML(t.how||'无具体步骤')}</div>
     </div>
     <button class="more" data-act="more">⋯</button>
   </div>`;
 }
+
 function bindTaskEvents(root) {
   root.querySelectorAll('.task').forEach(el => {
     const id = el.getAttribute('data-id'); const t = state.tasks.find(x => x.id === id); if (!t) return;
+    
     el.querySelector('[data-act="toggle"]').onclick = () => { toggleCheck(t); renderAll(); };
     el.querySelector('[data-act="more"]').onclick = e => { e.stopPropagation(); openTaskMenu(t); };
-    el.querySelector('[data-act="detail"]').onclick = () => openTaskDetail(t);
+    
+    // 长按事件实现
+    let pressTimer = null;
+    const startPress = (e) => {
+      if (e.target.closest('[data-act="toggle"]') || e.target.closest('[data-act="more"]')) return;
+      pressTimer = setTimeout(() => {
+        if (navigator.vibrate) navigator.vibrate(50);
+        openTaskMenu(t);
+      }, 500);
+    };
+    const cancelPress = () => { if(pressTimer) clearTimeout(pressTimer); };
+    const doClick = (e) => {
+      cancelPress();
+      if (pressTimer === null) return; // 如果已经长按触发过了，就不触发点击
+      if (e.target.closest('[data-act="toggle"]') || e.target.closest('[data-act="more"]')) return;
+      openTaskDetail(t);
+    };
+
+    el.addEventListener('touchstart', startPress, {passive: true});
+    el.addEventListener('touchend', doClick);
+    el.addEventListener('touchcancel', cancelPress);
+    el.addEventListener('touchmove', cancelPress);
+    
+    el.addEventListener('mousedown', startPress);
+    el.addEventListener('mouseup', doClick);
+    el.addEventListener('mouseleave', cancelPress);
   });
 }
 
@@ -675,6 +750,13 @@ function openTaskDetail(t) {
     }
   }
   let timeInfo = t.startTime && t.endTime ? `<div class="detail-row"><div class="detail-label">具体时间</div><div class="detail-val" style="color:var(--brand);font-weight:bold;">${t.startTime} - ${t.endTime} (${t.minutes}分钟)</div></div>` : `<div class="detail-row"><div class="detail-label">预计时长</div><div class="detail-val">${t.minutes} 分钟</div></div>`;
+  
+  let subHtml = '';
+  if (t.subtasks && t.subtasks.length > 0) {
+    subHtml = `<div class="detail-row"><div class="detail-label">子任务</div><ul class="subtask-list">` +
+      t.subtasks.map((st, i) => `<li><input type="checkbox" data-subidx="${i}" ${st.done?'checked':''}> <span style="${st.done?'text-decoration:line-through;color:#9aa5b5':''}">${escapeHTML(st.text)}</span></li>`).join('') +
+      `</ul></div>`;
+  }
 
   openModal(`<h3>任务详情</h3>
     <div class="detail-row"><div class="detail-label">标题</div><div class="detail-val" style="font-size:16px;">${escapeHTML(t.title)}</div></div>
@@ -684,10 +766,28 @@ function openTaskDetail(t) {
     ${timeInfo}
     <div class="detail-row"><div class="detail-label">详细步骤</div><div class="detail-box">${escapeHTML(t.how || '未填写')}</div></div>
     <div class="detail-row"><div class="detail-label">完成标准</div><div class="detail-box" style="background:rgba(15,157,118,.07);color:#0b6b51;">${escapeHTML(t.std || '未填写')}</div></div>
+    ${subHtml}
     <button class="btn-timer" id="btn-start-focus">▶ 开始专注 (${t.minutes} 分钟)</button>
     <div class="actions"><button class="btn" data-close="1">关闭</button></div>
   `);
   
+  if (t.subtasks && t.subtasks.length > 0) {
+    modalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.onchange = (e) => {
+        const idx = parseInt(e.target.getAttribute('data-subidx'), 10);
+        t.subtasks[idx].done = e.target.checked;
+        saveState();
+        // 重新渲染详情页更新划线
+        openTaskDetail(t);
+        // 如果全部子任务完成，或者取消完成，自动同步主任务状态
+        const allDone = t.subtasks.every(x => x.done);
+        if (allDone && !isChecked(t)) toggleCheck(t);
+        if (!allDone && isChecked(t)) toggleCheck(t);
+        renderAll();
+      };
+    });
+  }
+
   modalBody.querySelector('#btn-start-focus').onclick = () => openPomodoro(t);
 }
 
@@ -708,43 +808,50 @@ function openPomodoro(t) {
   const timeEl = document.getElementById('pomo-time');
   const btnToggle = document.getElementById('pomo-toggle');
   
-  timer = setInterval(() => {
+  const tick = () => {
     sec--;
     if (sec <= 0) {
-      clearInterval(timer);
+      clearInterval(timer); timer = null;
       timeEl.textContent = "00:00";
       if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-      toast("⏰ 专注时间到！");
-      setTimeout(closeModal, 1000);
+      if (!isChecked(t)) toggleCheck(t);
+      renderAll();
+      toast("⏰ 专注时间到！已自动打勾");
+      setTimeout(closeModal, 1500);
     } else {
       timeEl.textContent = format(sec);
     }
-  }, 1000);
+  };
+
+  timer = setInterval(tick, 1000);
   
   btnToggle.onclick = () => {
     if (timer) {
       clearInterval(timer); timer = null; btnToggle.textContent = '继续';
     } else {
-      timer = setInterval(() => {
-        sec--;
-        if (sec <= 0) {
-          clearInterval(timer); timeEl.textContent = "00:00";
-          if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-          toast("⏰ 专注时间到！");
-          setTimeout(closeModal, 1000);
-        } else {
-          timeEl.textContent = format(sec);
-        }
-      }, 1000);
+      timer = setInterval(tick, 1000);
       btnToggle.textContent = '暂停';
     }
   };
   
-  document.getElementById('pomo-cancel').onclick = () => { clearInterval(timer); closeModal(); };
+  document.getElementById('pomo-cancel').onclick = () => { if(timer) clearInterval(timer); closeModal(); };
 }
 
 function openTaskMenu(t) {
-  let html = '<h3>' + escapeHTML(t.title) + '</h3><div class="row"><button class="btn primary" data-a="edit">编辑</button><button class="btn" data-a="pin">' + (t.pinned ? '取消置顶' : '置顶') + '</button><button class="btn" data-a="date">改日期</button><button class="btn danger" data-a="del">删除</button>';
+  const ts = tasksOn(t.date);
+  const idx = ts.findIndex(x => x.id === t.id);
+  
+  let html = '<h3>' + escapeHTML(t.title) + '</h3><div class="row">';
+  html += '<button class="btn primary" data-a="edit">编辑</button>';
+  html += '<button class="btn" data-a="pin">' + (t.pinned ? '取消置顶' : '置顶') + '</button>';
+  html += '<button class="btn" data-a="date">改日期</button>';
+  html += '<button class="btn danger" data-a="del">删除</button>';
+  
+  // 排序按钮
+  html += '<div style="width:100%;height:1px;background:var(--line);margin:4px 0;"></div>';
+  html += '<button class="btn' + (idx <= 0 ? ' disabled' : '') + '" data-a="up" ' + (idx <= 0 ? 'disabled' : '') + '>上移 ⬆</button>';
+  html += '<button class="btn' + (idx >= ts.length-1 ? ' disabled' : '') + '" data-a="down" ' + (idx >= ts.length-1 ? 'disabled' : '') + '>下移 ⬇</button>';
+
   if (t.groupId) { const n = state.tasks.filter(x => x.groupId === t.groupId).length; if (n > 1) html += '<button class="btn danger" data-a="delgroup">删整组(' + n + '条)</button>'; }
   html += '</div>'; openModal(html);
   modalBody.querySelectorAll('[data-a]').forEach(b => {
@@ -755,6 +862,24 @@ function openTaskMenu(t) {
       else if (a === 'date') { closeModal(); openChangeDateDialog(t); }
       else if (a === 'del') { state.tasks = state.tasks.filter(x => x.id !== t.id); saveState(); closeModal(); renderAll(); toast('已删除'); }
       else if (a === 'delgroup') { const gid = t.groupId; state.tasks = state.tasks.filter(x => x.groupId !== gid); saveState(); closeModal(); renderAll(); toast('已删除整组'); }
+      else if (a === 'up') {
+        const prev = ts[idx - 1];
+        if (prev) {
+          const temp = prev.sortOrder;
+          prev.sortOrder = t.sortOrder;
+          t.sortOrder = temp;
+          saveState(); closeModal(); renderAll();
+        }
+      }
+      else if (a === 'down') {
+        const next = ts[idx + 1];
+        if (next) {
+          const temp = next.sortOrder;
+          next.sortOrder = t.sortOrder;
+          t.sortOrder = temp;
+          saveState(); closeModal(); renderAll();
+        }
+      }
     };
   });
 }
@@ -767,6 +892,12 @@ function openChangeDateDialog(t) {
 function openTaskEditor(id, defaults) {
   const t = id ? state.tasks.find(x => x.id === id) : null;
   const d = t || defaults || {};
+  
+  let subText = '';
+  if (t && t.subtasks && t.subtasks.length > 0) {
+    subText = t.subtasks.map(st => st.text).join('\n');
+  }
+
   openModal(`<h3>${t ? '编辑任务' : '新建任务'}</h3>
     <div class="field"><label>标题</label><input id="f-title" value="${escapeAttr(t ? t.title : '新任务')}"></div>
     <div class="field"><label>标签与颜色</label><div style="display:flex;gap:8px;"><input id="f-tag" style="flex:1;" value="${escapeAttr(t ? (t.tag||'') : '')}" placeholder="如：学习"><input id="f-tagcolor" type="color" value="${t ? (t.tagColor||'#6b7280') : '#6b7280'}" style="width:50px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;"></div></div>
@@ -775,8 +906,21 @@ function openTaskEditor(id, defaults) {
     <div class="field"><label>日期</label><input id="f-date" type="date" value="${t ? t.date : (d.date || todayStr())}"></div>
     <div class="field"><label>怎么做</label><textarea id="f-how">${escapeHTML(t ? (t.how||'') : '')}</textarea></div>
     <div class="field"><label>完成标准</label><textarea id="f-std">${escapeHTML(t ? (t.std||'') : '')}</textarea></div>
+    <div class="field"><label>子任务 (可选，每行一个)</label><textarea id="f-sub" style="min-height:48px;" placeholder="第一步...\n第二步...">${escapeHTML(subText)}</textarea></div>
     <div class="actions"><button class="btn" data-close="1">取消</button><button class="btn primary" id="f-save">保存</button></div>`);
+  
   modalBody.querySelector('#f-save').onclick = () => {
+    const subRaw = modalBody.querySelector('#f-sub').value.trim();
+    let newSubtasks = [];
+    if (subRaw) {
+      const lines = subRaw.split('\n').map(s => s.trim()).filter(Boolean);
+      newSubtasks = lines.map((text, i) => {
+        // 尽量保留原有的勾选状态
+        if (t && t.subtasks && t.subtasks[i] && t.subtasks[i].text === text) return t.subtasks[i];
+        return { text, done: false };
+      });
+    }
+
     const data = {
       title: modalBody.querySelector('#f-title').value.trim() || '未命名',
       tag: modalBody.querySelector('#f-tag').value.trim() || '自定义',
@@ -786,9 +930,13 @@ function openTaskEditor(id, defaults) {
       minutes: Math.max(1, parseInt(modalBody.querySelector('#f-min').value, 10) || 1),
       date: modalBody.querySelector('#f-date').value || todayStr(),
       how: modalBody.querySelector('#f-how').value.trim(),
-      std: modalBody.querySelector('#f-std').value.trim()
+      std: modalBody.querySelector('#f-std').value.trim(),
+      subtasks: newSubtasks
     };
-    if (t) Object.assign(t, data); else state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g'), category:'custom', pinned: false }, data));
+    if (t) Object.assign(t, data); else {
+      const maxOrder = Math.max(...state.tasks.map(x => x.sortOrder || 0), 0);
+      state.tasks.push(Object.assign({ id: uid('t'), groupId: uid('g'), category:'custom', pinned: false, sortOrder: maxOrder + 1 }, data));
+    }
     saveState(); closeModal(); renderAll(); toast('已保存');
   };
 }
@@ -815,8 +963,13 @@ function openAddRangeDialog() {
     const from = modalBody.querySelector('#f-from').value, to = modalBody.querySelector('#f-to').value;
     if (!from || !to || from > to) return toast('日期不合法');
     const gid = uid('g'); let cur = from, n = 0;
+    let baseOrder = Math.max(...state.tasks.map(x => x.sortOrder || 0), 0);
     while (cur <= to) {
-      if (!wdSet.size || wdSet.has(wdOf(cur))) { state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: 'custom', tag, tagColor, title, minutes, how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim(), pinned: false }); n++; }
+      if (!wdSet.size || wdSet.has(wdOf(cur))) {
+        baseOrder++;
+        state.tasks.push({ id: uid('t'), groupId: gid, date: cur, category: 'custom', tag, tagColor, title, minutes, how: modalBody.querySelector('#f-how').value.trim(), std: modalBody.querySelector('#f-std').value.trim(), pinned: false, sortOrder: baseOrder, subtasks: [] });
+        n++;
+      }
       cur = addDays(cur, 1);
     }
     saveState(); closeModal(); renderAll(); toast('已生成 ' + n + ' 条');
@@ -849,16 +1002,20 @@ function openBulkImportDialog() {
   modalBody.querySelector('#f-do-import').onclick = () => {
     const text = modalBody.querySelector('#f-bulk').value.trim(); if (!text) return;
     const lines = text.split('\n'); let count = 0; const gid = uid('g');
+    let baseOrder = Math.max(...state.tasks.map(x => x.sortOrder || 0), 0);
     lines.forEach(line => {
       const parts = line.split('|').map(s => s.trim());
-      if (parts.length >= 3) { state.tasks.push({ id: uid('t'), groupId: gid, date: parts[0] || todayStr(), tag: parts[1] || '自定义', tagColor: CAT_COLOR.custom, title: parts[2] || '未命名', minutes: parseInt(parts[3], 10) || 20, how: parts[4] || '', std: parts[5] || '', pinned: false }); count++; }
+      if (parts.length >= 3) {
+        baseOrder++;
+        state.tasks.push({ id: uid('t'), groupId: gid, date: parts[0] || todayStr(), tag: parts[1] || '自定义', tagColor: CAT_COLOR.custom, title: parts[2] || '未命名', minutes: parseInt(parts[3], 10) || 20, how: parts[4] || '', std: parts[5] || '', pinned: false, sortOrder: baseOrder, subtasks: [] }); count++;
+      }
     });
     saveState(); closeModal(); renderAll(); toast('成功导入 ' + count + ' 条');
   };
 }
 
 function exportJSON() {
-  const data = { app: 'growth-plan', version: 7, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
+  const data = { app: 'growth-plan', version: 10, exportedAt: new Date().toISOString(), meta: state.meta, tasks: state.tasks, checks: state.checks };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = 'growth-plan-backup-' + todayStr() + '.json';
@@ -873,7 +1030,7 @@ function openImportDialog() {
       try {
         const obj = JSON.parse(reader.result);
         if (!obj || !Array.isArray(obj.tasks)) throw new Error('bad');
-        state = { version: 7, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
+        state = { version: 10, meta: obj.meta || Object.assign({}, DEFAULT_META), tasks: obj.tasks, checks: obj.checks || {} };
         saveState(); closeModal(); renderAll(); toast('已导入');
       } catch(err) { toast('格式错误'); }
     };
